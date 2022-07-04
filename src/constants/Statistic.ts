@@ -1,0 +1,15 @@
+export enum Statistic {
+  Health = 0,
+  MaxHealth,
+  FreeCapacity,
+  Experience,
+  Level,
+  LevelPercent,
+  Mana,
+  MaxMana,
+  MagicLevel,
+  MagicLevelPercent,
+  Soul,
+  Stamina,
+  LastStatistic,
+}

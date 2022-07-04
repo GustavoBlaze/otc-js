@@ -1,0 +1,16 @@
+export enum Skill {
+  Fist = 0,
+  Club,
+  Sword,
+  Axe,
+  Distance,
+  Shielding,
+  Fishing,
+  CriticalChance,
+  CriticalDamage,
+  LifeLeechChance,
+  LifeLeechAmount,
+  ManaLeechChance,
+  ManaLeechAmount,
+  LastSkill,
+}

@@ -1,0 +1,18 @@
+export enum InventorySlot {
+  InventorySlotHead = 1,
+  InventorySlotNecklace,
+  InventorySlotBackpack,
+  InventorySlotArmor,
+  InventorySlotRight,
+  InventorySlotLeft,
+  InventorySlotLegs,
+  InventorySlotFeet,
+  InventorySlotRing,
+  InventorySlotAmmo,
+  InventorySlotPurse,
+  InventorySlotExt1,
+  InventorySlotExt2,
+  InventorySlotExt3,
+  InventorySlotExt4,
+  LastInventorySlot,
+}
