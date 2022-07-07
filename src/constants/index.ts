@@ -29,3 +29,19 @@ export { DeathType } from "./DeathType";
 export { StoreProductType } from "./StoreProductType";
 export { StoreErrorType } from "./StoreErrorType";
 export { StoreState } from "./StoreState";
+export { MessageMode } from "./MessageMode";
+
+export const TILE_PIXELS = 32,
+  MAX_ELEVATION = 24,
+  SEA_FLOOR = 7,
+  MAX_Z = 15,
+  UNDERGROUND_FLOOR = SEA_FLOOR + 1,
+  AWARE_UNDEGROUND_FLOOR_RANGE = 2,
+  INVISIBLE_TICKS_PER_FRAME = 500,
+  ITEM_TICKS_PER_FRAME = 500,
+  ANIMATED_TEXT_DURATION = 1000,
+  STATIC_DURATION_PER_CHARACTER = 60,
+  MIN_STATIC_TEXT_DURATION = 3000,
+  MAX_STATIC_TEXT_WIDTH = 200,
+  MAX_AUTOWALK_STEPS_RETRY = 10,
+  MAX_AUTOWALK_DIST = 127;
