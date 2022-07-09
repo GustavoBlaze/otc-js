@@ -1,5 +1,5 @@
-import { Protocol } from "./net";
 import dotenv from "dotenv";
+import { Protocol } from "./net";
 
 dotenv.config();
 

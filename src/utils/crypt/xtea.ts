@@ -57,7 +57,7 @@ export function encrypt(outputMessage: OutputMessage, key: Buffer): void {
 
   // add padding bytes if it needs
   if (encryptedSize % 8 != 0) {
-    let padding = 8 - (encryptedSize % 8);
+    const padding = 8 - (encryptedSize % 8);
     outputMessage.addPaddingBytes(padding, 0);
     encryptedSize += padding;
   }

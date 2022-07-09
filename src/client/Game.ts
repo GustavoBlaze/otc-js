@@ -1,32 +1,40 @@
-import {
-  ChaseMode,
-  Direction,
-  FightMode,
-  GameFeature,
-  PVPMode,
-} from "~/constants";
+import { ChaseMode, Direction, FightMode, PVPMode } from "~/constants";
 import GameFeatureManager from "./GameFeatureManager";
 import MessageModeManager from "./MessageModeManager";
 
 export default class Game {
   private _gameFeatureManager = new GameFeatureManager();
+
   private _messageModeManager = new MessageModeManager();
+
   private _clientVersion = 0;
+
   private _protocolVersion = 0;
+
   private _online = false;
+
   private _dead = false;
+
   private _expertPVPMode = false;
+
   private _ping = 0;
+
   private _pingSent = 0;
+
   private _pingReceived = 0;
+
   // private _pingTimer: any = null;
   // private _dashTimer: any = null;
   // private _seq: any = null;
   // private _pingDelay = 0;
   private _fightMode?: FightMode;
+
   private _chaseMode?: ChaseMode;
+
   private _PVPMode?: PVPMode;
+
   private _lastWalkDir?: Direction;
+
   // private _unjustifiedPoints?: Object;
   // private _openPVPSituations?: number;
   private _safeFight: boolean = false;
@@ -67,7 +75,6 @@ export default class Game {
     }
 
     this._protocolVersion = version;
-
     this._messageModeManager.buildMessageMode(version);
   }
 }

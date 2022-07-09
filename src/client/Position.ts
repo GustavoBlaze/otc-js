@@ -4,7 +4,9 @@ const RAD_TO_DEC = 180 / Math.PI;
 
 export default class Position {
   public x: number;
+
   public y: number;
+
   public z: number;
 
   constructor(x?: number, y?: number, z?: number) {
@@ -103,19 +105,26 @@ export default class Position {
 
     if (angle >= 360 - 22.5 || angle < 0 + 22.5) {
       return Direction.East;
-    } else if (angle >= 45 - 22.5 && angle < 45 + 22.5) {
+    }
+    if (angle >= 45 - 22.5 && angle < 45 + 22.5) {
       return Direction.NorthEast;
-    } else if (angle >= 90 - 22.5 && angle < 90 + 22.5) {
+    }
+    if (angle >= 90 - 22.5 && angle < 90 + 22.5) {
       return Direction.North;
-    } else if (angle >= 135 - 22.5 && angle < 135 + 22.5) {
+    }
+    if (angle >= 135 - 22.5 && angle < 135 + 22.5) {
       return Direction.NorthWest;
-    } else if (angle >= 180 - 22.5 && angle < 180 + 22.5) {
+    }
+    if (angle >= 180 - 22.5 && angle < 180 + 22.5) {
       return Direction.West;
-    } else if (angle >= 225 - 22.5 && angle < 225 + 22.5) {
+    }
+    if (angle >= 225 - 22.5 && angle < 225 + 22.5) {
       return Direction.SouthWest;
-    } else if (angle >= 270 - 22.5 && angle < 270 + 22.5) {
+    }
+    if (angle >= 270 - 22.5 && angle < 270 + 22.5) {
       return Direction.South;
-    } else if (angle >= 315 - 22.5 && angle < 315 + 22.5) {
+    }
+    if (angle >= 315 - 22.5 && angle < 315 + 22.5) {
       return Direction.SouthEast;
     }
 
@@ -142,7 +151,7 @@ export default class Position {
   }
 
   distance(pos: Position) {
-    return Math.sqrt(Math.pow(this.x - pos.x, 2) + Math.pow(this.y - pos.y, 2));
+    return Math.sqrt((this.x - pos.x) ** 2 + (this.y - pos.y) ** 2);
   }
 
   manhattanDistance(pos: Position) {
@@ -181,7 +190,7 @@ export default class Position {
   }
 
   isEqual(other: Position) {
-    return this.x == other.x && this.y == other.y && this.z == other.z;
+    return this.x === other.x && this.y === other.y && this.z === other.z;
   }
 
   isNotEqual(other: Position) {
@@ -192,7 +201,7 @@ export default class Position {
     return (
       Math.abs(this.x - pos.x) <= rangeX &&
       Math.abs(this.y - pos.y) <= rangeY &&
-      this.z == pos.z
+      this.z === pos.z
     );
   }
 
@@ -217,7 +226,7 @@ export default class Position {
   }
 
   up(n = 1) {
-    let nz = this.z - n;
+    const nz = this.z - n;
     if (nz >= 0 && nz <= MAX_Z) {
       this.z = nz;
       return true;
@@ -226,7 +235,7 @@ export default class Position {
   }
 
   down(n = 1) {
-    let nz = this.z + n;
+    const nz = this.z + n;
     if (nz >= 0 && nz <= MAX_Z) {
       this.z = nz;
       return true;
@@ -235,9 +244,9 @@ export default class Position {
   }
 
   coveredUp(n = 1) {
-    let nx = this.x + n,
-      ny = this.y + n,
-      nz = this.z - n;
+    const nx = this.x + n;
+    const ny = this.y + n;
+    const nz = this.z - n;
     if (
       nx >= 0 &&
       nx <= 65535 &&
@@ -255,9 +264,9 @@ export default class Position {
   }
 
   coveredDown(n = 1) {
-    let nx = this.x - n,
-      ny = this.y - n,
-      nz = this.z + n;
+    const nx = this.x - n;
+    const ny = this.y - n;
+    const nz = this.z + n;
     if (
       nx >= 0 &&
       nx <= 65535 &&

@@ -9,9 +9,13 @@ const maxHeaderSize = 8;
 
 export default class OutputMessage {
   _buffer: Buffer;
+
   _rsa?: RSA;
+
   _writePos: number = maxHeaderSize;
+
   _headerPos: number = maxHeaderSize;
+
   _messageSize: number = 0;
 
   constructor(rsa: RSA) {

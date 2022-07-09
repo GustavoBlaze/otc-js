@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 import { MessageMode } from "~/constants";
 
 export default class MessageModeManager {

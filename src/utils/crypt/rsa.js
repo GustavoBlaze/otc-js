@@ -31,7 +31,7 @@ export default class RSA {
     });
 
     const bitString = new KJUR.asn1.DERBitString({
-      hex: "00" + secondSequence.getEncodedHex(),
+      hex: `00${secondSequence.getEncodedHex()}`,
     });
 
     const seq = new KJUR.asn1.DERSequence({
@@ -47,7 +47,7 @@ export default class RSA {
 
   getPublicKeyDER() {
     let key = "-----BEGIN PUBLIC KEY-----\n";
-    key += wordwrap(this.getPublicBaseKeyB64()) + "\n";
+    key += `${wordwrap(this.getPublicBaseKeyB64())}\n`;
     key += "-----END PUBLIC KEY-----";
     return key;
   }

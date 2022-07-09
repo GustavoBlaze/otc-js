@@ -1,8 +1,8 @@
 export function adler32(buffer, size) {
-  let a = 1,
-    b = 0,
-    i = 0,
-    tlen;
+  let a = 1;
+  let b = 0;
+  let i = 0;
+  let tlen;
 
   while (size > 0) {
     tlen = size > 5552 ? 5552 : size;

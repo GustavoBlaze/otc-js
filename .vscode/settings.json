@@ -1,4 +1,14 @@
 {
-  "editor.formatOnSave": true,
-  "cSpell.words": ["Automap", "jsbn", "KJUR", "tlen", "unpad", "xtea"]
+  // "editor.formatOnSave": true,
+  "cSpell.words": ["Automap", "jsbn", "KJUR", "tlen", "unpad", "xtea"],
+  "[typescript]": {
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": true
+    }
+  },
+  "[javascript]": {
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": true
+    }
+  }
 }

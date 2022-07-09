@@ -13,13 +13,17 @@ const READ_TIMEOUT = 30 * 1000;
 
 export default class Protocol {
   private _host = "";
+
   private _port = 7171;
 
   private _connected = false;
+
   private _connecting = false;
+
   private _socket?: Socket;
 
   private _xteaEncryptionEnabled = false;
+
   private _checksumEnabled = false;
 
   private _inputMessage: InputMessage;
@@ -166,7 +170,6 @@ export default class Protocol {
       console.log(
         "[Protocol]: Got a network message with invalid XTEA encryption"
       );
-      return;
     }
 
     // dispatch this._inputMessage to the handler

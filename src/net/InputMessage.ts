@@ -7,8 +7,11 @@ const bufferMaxSize = 65536;
 const maxHeaderSize = 8;
 export default class InputMessage {
   _buffer: Buffer = Buffer.allocUnsafe(bufferMaxSize);
+
   _readPos: number = maxHeaderSize;
+
   _headerPos: number = maxHeaderSize;
+
   _messageSize: number = 0;
 
   constructor() {
@@ -24,12 +27,15 @@ export default class InputMessage {
   getReadSize() {
     return this._readPos - this._headerPos;
   }
+
   getReadPos() {
     return this._readPos;
   }
+
   getUnreadSize() {
     return this._messageSize - (this._readPos - this._headerPos);
   }
+
   getMessageSize() {
     return this._messageSize;
   }
@@ -108,7 +114,7 @@ export default class InputMessage {
   getDouble() {
     const precision = this.getU8();
     const value = this.getU32();
-    return value / Math.pow(10, precision);
+    return value / 10 ** precision;
   }
 
   getReadBuffer() {
