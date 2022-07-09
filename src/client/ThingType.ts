@@ -1,71 +1,16 @@
-/* eslint-disable no-shadow */
-/* eslint-disable no-unused-vars */
-enum FrameGroupType {
-  FrameGroupDefault = 0,
-  FrameGroupIdle = FrameGroupDefault,
-  FrameGroupMoving,
-}
+import {
+  FrameGroupType,
+  GameFeature,
+  ThingAttr,
+  ThingCategory,
+} from "~/constants";
+import { FileStream } from "~/core";
+import GameFeatureManager from "./GameFeatureManager";
 
-enum ThingCategory {
-  ThingCategoryItem = 0,
-  ThingCategoryCreature,
-  ThingCategoryEffect,
-  ThingCategoryMissile,
-  ThingInvalidCategory,
-  ThingLastCategory = ThingInvalidCategory,
-}
-
-enum ThingAttr {
-  ThingAttrGround = 0,
-  ThingAttrGroundBorder = 1,
-  ThingAttrOnBottom = 2,
-  ThingAttrOnTop = 3,
-  ThingAttrContainer = 4,
-  ThingAttrStackable = 5,
-  ThingAttrForceUse = 6,
-  ThingAttrMultiUse = 7,
-  ThingAttrWritable = 8,
-  ThingAttrWritableOnce = 9,
-  ThingAttrFluidContainer = 10,
-  ThingAttrSplash = 11,
-  ThingAttrNotWalkable = 12,
-  ThingAttrNotMoveable = 13,
-  ThingAttrBlockProjectile = 14,
-  ThingAttrNotPathable = 15,
-  ThingAttrPickupable = 16,
-  ThingAttrHangable = 17,
-  ThingAttrHookSouth = 18,
-  ThingAttrHookEast = 19,
-  ThingAttrRotateable = 20,
-  ThingAttrLight = 21,
-  ThingAttrDontHide = 22,
-  ThingAttrTranslucent = 23,
-  ThingAttrDisplacement = 24,
-  ThingAttrElevation = 25,
-  ThingAttrLyingCorpse = 26,
-  ThingAttrAnimateAlways = 27,
-  ThingAttrMinimapColor = 28,
-  ThingAttrLensHelp = 29,
-  ThingAttrFullGround = 30,
-  ThingAttrLook = 31,
-  ThingAttrCloth = 32,
-  ThingAttrMarket = 33,
-  ThingAttrUsable = 34,
-  ThingAttrWrapable = 35,
-  ThingAttrUnwrapable = 36,
-  ThingAttrTopEffect = 37,
-
-  // additional
-  ThingAttrOpacity = 100,
-  ThingAttrNotPreWalkable = 101,
-
-  ThingAttrFloorChange = 252,
-  ThingAttrNoMoveAnimation = 253, // 10.10: real value is 16, but we need to do this for backwards compatibility
-  ThingAttrChargeable = 254, // deprecated
-  ThingLastAttr = 255,
-}
-
+type ThingTypeAttribute = Boolean | Number | Light | MarketData;
 export default class ThingType {
+  private _null = true;
+
   private _id = 0;
 
   private _animationPhases = 0;
@@ -92,7 +37,17 @@ export default class ThingType {
 
   private _displacement: Point = { x: 0, y: 0 };
 
-  private _attributes = new Map<ThingAttr, Boolean | Number>();
+  private _attributes = new Map<ThingAttr, ThingTypeAttribute>();
+
+  private _category: ThingCategory = 0;
+
+  private _clientVersion: number;
+
+  private _spritesIndex?: Array<Number>;
+
+  constructor(clientVersion: number = 0) {
+    this._clientVersion = clientVersion;
+  }
 
   get size() {
     return this._size;
@@ -323,4 +278,214 @@ export default class ThingType {
   isTopEffect() {
     return !!this._attributes.get(ThingAttr.ThingAttrTopEffect);
   }
+
+  async unserialize(
+    clientId: number,
+    category: ThingCategory,
+    fileStream: FileStream,
+    featureManager: GameFeatureManager
+  ) {
+    this._null = false;
+    this._id = clientId;
+    this._category = category;
+
+    let count = 0;
+    let attr = -1;
+    let done = false;
+
+    for (let i = 0; i < ThingAttr.ThingLastAttr; i++) {
+      count++;
+      attr = await fileStream.getU8();
+
+      if (attr === ThingAttr.ThingLastAttr) {
+        done = true;
+        break;
+      }
+
+      if (this._clientVersion >= 1000) {
+        attr = attr === 16 ? ThingAttr.ThingAttrNoMoveAnimation : attr - 1;
+      } else if (this._clientVersion >= 860) {
+        // no changes here
+      } else if (this._clientVersion >= 780) {
+        if (attr == 8) {
+          this._attributes.set(ThingAttr.ThingAttrChargeable, true);
+          continue;
+        } else if (attr > 8) {
+          attr -= 1;
+        }
+      } else if (this._clientVersion >= 755) {
+        if (attr == 23) {
+          attr = ThingAttr.ThingAttrFloorChange;
+        }
+      } else if (this._clientVersion >= 740) {
+        if (attr > 0 && attr <= 15) attr += 1;
+        else if (attr == 16) attr = ThingAttr.ThingAttrLight;
+        else if (attr == 17) attr = ThingAttr.ThingAttrFloorChange;
+        else if (attr == 18) attr = ThingAttr.ThingAttrFullGround;
+        else if (attr == 19) attr = ThingAttr.ThingAttrElevation;
+        else if (attr == 20) attr = ThingAttr.ThingAttrDisplacement;
+        else if (attr == 22) attr = ThingAttr.ThingAttrMinimapColor;
+        else if (attr == 23) attr = ThingAttr.ThingAttrRotateable;
+        else if (attr == 24) attr = ThingAttr.ThingAttrLyingCorpse;
+        else if (attr == 25) attr = ThingAttr.ThingAttrHangable;
+        else if (attr == 26) attr = ThingAttr.ThingAttrHookSouth;
+        else if (attr == 27) attr = ThingAttr.ThingAttrHookEast;
+        else if (attr == 28) attr = ThingAttr.ThingAttrAnimateAlways;
+
+        /* "Multi Use" and "Force Use" are swapped */
+        if (attr == ThingAttr.ThingAttrMultiUse)
+          attr = ThingAttr.ThingAttrForceUse;
+        else if (attr == ThingAttr.ThingAttrForceUse)
+          attr = ThingAttr.ThingAttrMultiUse;
+      }
+
+      switch (attr) {
+        case ThingAttr.ThingAttrDisplacement: {
+          if (this._clientVersion >= 755) {
+            this._displacement.x = await fileStream.getU16();
+            this._displacement.y = await fileStream.getU16();
+          } else {
+            this._displacement.x = 8;
+            this._displacement.y = 8;
+          }
+
+          this._attributes.set(attr, true);
+          break;
+        }
+        case ThingAttr.ThingAttrLight: {
+          const light: Light = {
+            intensity: await fileStream.getU16(),
+            color: await fileStream.getU16(),
+          };
+
+          this._attributes.set(attr, light);
+          break;
+        }
+
+        case ThingAttr.ThingAttrMarket: {
+          const market: MarketData = {
+            category: await fileStream.getU16(),
+            tradeAs: await fileStream.getU16(),
+            showAs: await fileStream.getU16(),
+            name: await fileStream.getString(),
+            requiredLevel: await fileStream.getU16(),
+            restrictVocation: await fileStream.getU16(),
+          };
+
+          this._attributes.set(attr, market);
+          break;
+        }
+        case ThingAttr.ThingAttrElevation: {
+          this._elevation = await fileStream.getU16();
+          this._attributes.set(attr, this._elevation);
+          break;
+        }
+        case ThingAttr.ThingAttrUsable:
+        case ThingAttr.ThingAttrGround:
+        case ThingAttr.ThingAttrWritable:
+        case ThingAttr.ThingAttrWritableOnce:
+        case ThingAttr.ThingAttrMinimapColor:
+        case ThingAttr.ThingAttrCloth:
+        case ThingAttr.ThingAttrLensHelp: {
+          this._attributes.set(attr, await fileStream.getU16());
+          break;
+        }
+        default:
+          this._attributes.set(attr, true);
+          break;
+      }
+    }
+
+    if (!done) {
+      throw new Error(
+        `[ThingType]: corrupt data (id: ${this._id}, category: ${this._category}, count: ${count}, lastAttr: ${attr})`
+      );
+    }
+
+    const hasFrameGroup =
+      category === ThingCategory.ThingCategoryCreature &&
+      featureManager.getFeature(GameFeature.GameIdleAnimations);
+
+    const groupCount = hasFrameGroup ? await fileStream.getU8() : 1;
+    this._animationPhases = 0;
+    let totalSpritesCount = 0;
+
+    for (let i = 0; i < groupCount; i++) {
+      let frameGroupType = FrameGroupType.FrameGroupDefault;
+      if (hasFrameGroup) frameGroupType = await fileStream.getU8();
+
+      const width = await fileStream.getU8();
+      const height = await fileStream.getU8();
+
+      this._size = {
+        width,
+        height,
+      };
+
+      if (width > 1 || height > 1) {
+        this._realSize = await fileStream.getU8();
+        this._exactSize = Math.min(
+          this._realSize,
+          Math.max(width * 32, height * 32)
+        );
+      } else {
+        this._exactSize = 32;
+      }
+
+      this._layers = await fileStream.getU8();
+      this._numPatternX = await fileStream.getU8();
+      this._numPatternY = await fileStream.getU8();
+
+      if (this._clientVersion >= 755) {
+        this._numPatternZ = await fileStream.getU8();
+      } else {
+        this._numPatternZ = 1;
+      }
+
+      const groupAnimationPhases = await fileStream.getU8();
+      this._animationPhases += groupAnimationPhases;
+
+      if (
+        groupAnimationPhases > 1 &&
+        featureManager.getFeature(GameFeature.GameEnhancedAnimations)
+      ) {
+        // Todo: implement
+        // m_animator = AnimatorPtr(new Animator);
+        // m_animator->unserialize(groupAnimationsPhases, fin);
+      }
+
+      const area = this._size.width * this._size.height;
+
+      const totalSprites =
+        area *
+        this._layers *
+        this._numPatternX *
+        this._numPatternY *
+        this._numPatternZ;
+
+      if (totalSpritesCount + totalSprites > 4096) {
+        throw new Error("A thing type has more than 4096 sprites");
+      }
+
+      this._spritesIndex = new Array(totalSpritesCount + totalSprites);
+      for (
+        let j = totalSpritesCount;
+        j < totalSpritesCount + totalSprites;
+        j++
+      ) {
+        this._spritesIndex[j] = featureManager.getFeature(
+          GameFeature.GameSpritesU32
+        )
+          ? await fileStream.getU32()
+          : await fileStream.getU16();
+      }
+
+      totalSpritesCount += totalSprites;
+    }
+  }
+
+  // m_textures.resize(m_animationPhases);
+  // m_texturesFramesRects.resize(m_animationPhases);
+  // m_texturesFramesOriginRects.resize(m_animationPhases);
+  // m_texturesFramesOffsets.resize(m_animationPhases);
 }

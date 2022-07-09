@@ -30,6 +30,9 @@ export { StoreProductType } from "./StoreProductType";
 export { StoreErrorType } from "./StoreErrorType";
 export { StoreState } from "./StoreState";
 export { MessageMode } from "./MessageMode";
+export { ThingCategory } from "./ThingCategory";
+export { FrameGroupType } from "./FrameGroupType";
+export { ThingAttr } from "./ThingAttr";
 
 export const TILE_PIXELS = 32;
 export const MAX_ELEVATION = 24;

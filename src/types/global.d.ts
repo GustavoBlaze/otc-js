@@ -9,6 +9,20 @@ declare global {
     x: number;
     y: number;
   };
+
+  type Light = {
+    intensity: number;
+    color: number;
+  };
+
+  type MarketData = {
+    category: number;
+    tradeAs: number;
+    showAs: number;
+    name: string;
+    restrictVocation: number;
+    requiredLevel: number;
+  };
 }
 
 export {};

@@ -12,6 +12,8 @@ module.exports = {
   globals: {
     Size: "readonly",
     Point: "readonly",
+    Light: "readonly",
+    MarketData: "readonly",
   },
   plugins: ["@typescript-eslint", "prettier", "import"],
   rules: {
@@ -26,6 +28,9 @@ module.exports = {
     "no-unused-vars": "off",
     "no-shadow": "off",
     "class-methods-use-this": "off",
+    "no-console": "off",
+    "no-await-in-loop": "off",
+    "no-continue": "off",
     "import/extensions": [
       "error",
       "ignorePackages",
