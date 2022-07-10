@@ -1,6 +1,6 @@
 import { FileStream } from "~/core";
-import { ThingCategory } from "~/constants";
-import { ThingType } from "~/client";
+import { ThingAttr, ThingCategory } from "~/constants";
+import ThingType from "./ThingType";
 import GameFeatureManager from "./GameFeatureManager";
 
 export default class ThingTypeManager {
@@ -14,8 +14,41 @@ export default class ThingTypeManager {
 
   private _featureManager: GameFeatureManager;
 
+  private _clientVersion: number;
+
+  static _nullThingType = new ThingType();
+
   constructor(featureManager: GameFeatureManager) {
     this._featureManager = featureManager;
+    this._clientVersion = 0;
+  }
+
+  getThingType(id: number, category: ThingCategory) {
+    if (
+      category >= ThingCategory.ThingLastCategory ||
+      id >= this._thingTypes[category]?.length
+    ) {
+      console.error(
+        `[ThingTypeManager]: getThingType: invalid id or category. Id:${id} Category:${category}`
+      );
+      return ThingTypeManager._nullThingType;
+    }
+
+    return this._thingTypes[category][id];
+  }
+
+  findThingTypeByAttr(attr: ThingAttr, category: ThingCategory) {
+    const list: ThingType[] = [];
+
+    for (let i = 0; i < this._thingTypes[category].length; i++) {
+      const type = this._thingTypes[category][i];
+
+      if (type.hasAttr(attr)) {
+        list.push(type);
+      }
+    }
+
+    return list;
   }
 
   isDatLoaded() {
@@ -65,13 +98,17 @@ export default class ThingTypeManager {
             id,
             category as ThingCategory,
             fileStream,
-            this._featureManager
+            this._featureManager,
+            this._clientVersion
           );
           this._thingTypes[category][id] = type;
         }
       }
+      // Dispatch event to notify that dat has been loaded
+      return true;
     } catch (e) {
       console.error("Failed to read dat: ", e);
+      return false;
     }
   }
 }

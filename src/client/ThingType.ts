@@ -6,6 +6,7 @@ import {
 } from "~/constants";
 import { FileStream } from "~/core";
 import GameFeatureManager from "./GameFeatureManager";
+import Animator from "./Animator";
 
 type ThingTypeAttribute = Boolean | Number | Light | MarketData;
 export default class ThingType {
@@ -37,19 +38,23 @@ export default class ThingType {
 
   private _displacement: Point = { x: 0, y: 0 };
 
+  private _animator?: Animator;
+
   private _attributes = new Map<ThingAttr, ThingTypeAttribute>();
 
   private _category: ThingCategory = 0;
 
-  private _clientVersion: number;
-
   private _spritesIndex?: Array<Number>;
 
-  constructor(clientVersion: number = 0) {
-    this._clientVersion = clientVersion;
-  }
+  private _textures = [];
 
-  get size() {
+  private _texturesFramesRects = [];
+
+  private _texturesFramesOriginRects = [];
+
+  private _texturesFramesOffsets = [];
+
+  getSize() {
     return this._size;
   }
 
@@ -67,7 +72,10 @@ export default class ThingType {
   //   yPattern = 0,
   //   zPattern = 0,
   //   animationPhase = 0
-  // );
+  // ): number {
+  //   if (this._null) return 0;
+
+  // }
 
   getRealSize() {
     return this._realSize;
@@ -91,6 +99,14 @@ export default class ThingType {
 
   getDisplacement() {
     return this._displacement;
+  }
+
+  getDisplacementX() {
+    return this.getDisplacement().x;
+  }
+
+  getDisplacementY() {
+    return this.getDisplacement().y;
   }
 
   getElevation() {
@@ -279,11 +295,28 @@ export default class ThingType {
     return !!this._attributes.get(ThingAttr.ThingAttrTopEffect);
   }
 
+  hasAttr(attr: ThingAttr) {
+    return this._attributes.has(attr);
+  }
+
+  getMarketData() {
+    return this._attributes.get(ThingAttr.ThingAttrMarket) as MarketData;
+  }
+
+  getAnimationPhases() {
+    return this._animationPhases;
+  }
+
+  getAnimator() {
+    return this._animator;
+  }
+
   async unserialize(
     clientId: number,
     category: ThingCategory,
     fileStream: FileStream,
-    featureManager: GameFeatureManager
+    featureManager: GameFeatureManager,
+    clientVersion: number
   ) {
     this._null = false;
     this._id = clientId;
@@ -302,22 +335,22 @@ export default class ThingType {
         break;
       }
 
-      if (this._clientVersion >= 1000) {
+      if (clientVersion >= 1000) {
         attr = attr === 16 ? ThingAttr.ThingAttrNoMoveAnimation : attr - 1;
-      } else if (this._clientVersion >= 860) {
+      } else if (clientVersion >= 860) {
         // no changes here
-      } else if (this._clientVersion >= 780) {
+      } else if (clientVersion >= 780) {
         if (attr == 8) {
           this._attributes.set(ThingAttr.ThingAttrChargeable, true);
           continue;
         } else if (attr > 8) {
           attr -= 1;
         }
-      } else if (this._clientVersion >= 755) {
+      } else if (clientVersion >= 755) {
         if (attr == 23) {
           attr = ThingAttr.ThingAttrFloorChange;
         }
-      } else if (this._clientVersion >= 740) {
+      } else if (clientVersion >= 740) {
         if (attr > 0 && attr <= 15) attr += 1;
         else if (attr == 16) attr = ThingAttr.ThingAttrLight;
         else if (attr == 17) attr = ThingAttr.ThingAttrFloorChange;
@@ -341,7 +374,7 @@ export default class ThingType {
 
       switch (attr) {
         case ThingAttr.ThingAttrDisplacement: {
-          if (this._clientVersion >= 755) {
+          if (clientVersion >= 755) {
             this._displacement.x = await fileStream.getU16();
             this._displacement.y = await fileStream.getU16();
           } else {
@@ -436,7 +469,7 @@ export default class ThingType {
       this._numPatternX = await fileStream.getU8();
       this._numPatternY = await fileStream.getU8();
 
-      if (this._clientVersion >= 755) {
+      if (clientVersion >= 755) {
         this._numPatternZ = await fileStream.getU8();
       } else {
         this._numPatternZ = 1;
@@ -449,9 +482,8 @@ export default class ThingType {
         groupAnimationPhases > 1 &&
         featureManager.getFeature(GameFeature.GameEnhancedAnimations)
       ) {
-        // Todo: implement
-        // m_animator = AnimatorPtr(new Animator);
-        // m_animator->unserialize(groupAnimationsPhases, fin);
+        this._animator = new Animator();
+        this._animator.unserialize(groupAnimationPhases, fileStream);
       }
 
       const area = this._size.width * this._size.height;
@@ -482,10 +514,10 @@ export default class ThingType {
 
       totalSpritesCount += totalSprites;
     }
-  }
 
-  // m_textures.resize(m_animationPhases);
-  // m_texturesFramesRects.resize(m_animationPhases);
-  // m_texturesFramesOriginRects.resize(m_animationPhases);
-  // m_texturesFramesOffsets.resize(m_animationPhases);
+    this._textures.length = this._animationPhases;
+    this._texturesFramesRects.length = this._animationPhases;
+    this._texturesFramesOriginRects.length = this._animationPhases;
+    this._texturesFramesOffsets.length = this._animationPhases;
+  }
 }

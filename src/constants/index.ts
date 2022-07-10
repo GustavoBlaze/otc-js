@@ -33,6 +33,10 @@ export { MessageMode } from "./MessageMode";
 export { ThingCategory } from "./ThingCategory";
 export { FrameGroupType } from "./FrameGroupType";
 export { ThingAttr } from "./ThingAttr";
+export { AnimationPhase } from "./AnimationPhase";
+export { AnimationDirection } from "./AnimationDirection";
+export { ItemCategory } from "./ItemCategory";
+export { ClientVersion } from "./ClientVersion";
 
 export const TILE_PIXELS = 32;
 export const MAX_ELEVATION = 24;

@@ -1,0 +1,33 @@
+export enum ItemTypeAttr {
+  ServerId = 16,
+  ClientId = 17,
+  Name = 18, // deprecated
+  Desc = 19, // deprecated
+  Speed = 20,
+  Slot = 21, // deprecated
+  MaxItems = 22, // deprecated
+  Weight = 23, // deprecated
+  Weapon = 24, // deprecated
+  Ammunition = 25, // deprecated
+  Armor = 26, // deprecated
+  MagicLevel = 27, // deprecated
+  MagicField = 28, // deprecated
+  Writable = 29, // deprecated
+  RotateTo = 30, // deprecated
+  Decay = 31, // deprecated
+  SpriteHash = 32,
+  MinimapColor = 33,
+  _07 = 34,
+  _08 = 35,
+  Light = 36,
+  Decay2 = 37, // deprecated
+  Weapon2 = 38, // deprecated
+  Ammunition2 = 39, // deprecated
+  Armor2 = 40, // deprecated
+  Writable2 = 41, // deprecated
+  Light2 = 42,
+  TopOrder = 43,
+  Wrtiable3 = 44, // deprecated
+  WareId = 45,
+  Last = 46,
+}
