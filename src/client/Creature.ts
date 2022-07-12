@@ -5,6 +5,12 @@ import Thing from "./Thing";
 const SHIELD_BLINK_TICKS = 500;
 const VOLATILE_SQUARE_DURATION = 1000;
 
+type SpeedFormula = {
+  a: double;
+  b: double;
+  c: double;
+};
+
 export default class Creature extends Thing {
   protected _id = 0;
 
@@ -20,6 +26,8 @@ export default class Creature extends Thing {
   protected _speed = 0;
 
   protected _baseSpeed = 0;
+
+  protected _speedFormula?: SpeedFormula;
 
   protected _skull = 0;
 
@@ -101,5 +109,65 @@ export default class Creature extends Thing {
 
   isMonster() {
     return false;
+  }
+
+  isPlayer() {
+    return false;
+  }
+
+  setName(name: string) {
+    this._name = name;
+  }
+
+  onDeath() {
+    // Todo: implement
+  }
+
+  setHealthPercent(healthPercent: uint8) {
+    this._healthPercent = healthPercent;
+
+    if (healthPercent <= 0) {
+      this.onDeath();
+    }
+  }
+
+  setDirection(direction: Direction) {
+    this._direction = direction;
+  }
+
+  setOutfit(/* outfit: Outfit */) {
+    // Todo: implement
+  }
+
+  setSpeed(speed: uint16) {
+    this._speed = speed;
+  }
+
+  setBaseSpeed(baseSpeed: double) {
+    this._baseSpeed = baseSpeed;
+  }
+
+  setSkull(skull: uint8) {
+    this._skull = skull;
+  }
+
+  setShield(shield: uint8) {
+    this._shield = shield;
+  }
+
+  setEmblem(emblem: uint8) {
+    this._emblem = emblem;
+  }
+
+  setType(type: uint8) {
+    this._type = type;
+  }
+
+  setIcon(icon: uint8) {
+    this._icon = icon;
+  }
+
+  setSpeedFormula(formula: SpeedFormula) {
+    this._speedFormula = { ...formula };
   }
 }

@@ -37,6 +37,7 @@ export { AnimationPhase } from "./AnimationPhase";
 export { AnimationDirection } from "./AnimationDirection";
 export { ItemCategory } from "./ItemCategory";
 export { ClientVersion } from "./ClientVersion";
+export { ItemAttr } from "./ItemAttr";
 
 export const TILE_PIXELS = 32;
 export const MAX_ELEVATION = 24;

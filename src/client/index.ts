@@ -9,3 +9,6 @@ export { default as Thing } from "./Thing";
 export { default as Creature } from "./Creature";
 export { default as Npc } from "./Npc";
 export { default as Monster } from "./Monster";
+export { default as Player } from "./Player";
+export { default as LocalPlayer } from "./LocalPlayer";
+export { default as Item } from "./Item";
