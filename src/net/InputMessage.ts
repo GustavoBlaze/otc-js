@@ -1,7 +1,8 @@
 import { Buffer } from "node:buffer";
 import assert from "node:assert";
+import bindings from "bindings";
 
-import { adler32 } from "~/utils/math";
+const { adler32 } = bindings("adler32");
 
 const bufferMaxSize = 65536;
 const maxHeaderSize = 8;
@@ -150,8 +151,12 @@ export default class InputMessage {
       this.getUnreadSize()
     );
 
-    const actualCheck = adler32(checksumAbleBuffer, checksumAbleBuffer.length);
+    const actualCheck = adler32(checksumAbleBuffer);
 
     return expectedCheck === actualCheck;
+  }
+
+  eof() {
+    return this._readPos - this._headerPos >= this._messageSize;
   }
 }

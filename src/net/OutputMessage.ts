@@ -1,8 +1,9 @@
 import { Buffer } from "node:buffer";
-import { adler32 } from "~/utils/math";
+import bindings from "bindings";
 import type { RSA } from "~/utils/crypt";
 import assert from "node:assert";
 
+const { adler32 } = bindings("adler32");
 const bufferMaxSize = 65536;
 const maxStringSize = 65536;
 const maxHeaderSize = 8;
@@ -18,7 +19,7 @@ export default class OutputMessage {
 
   _messageSize: number = 0;
 
-  constructor(rsa: RSA) {
+  constructor(rsa?: RSA) {
     this._buffer = Buffer.allocUnsafe(bufferMaxSize);
     this._rsa = rsa;
     this.reset();
@@ -119,10 +120,12 @@ export default class OutputMessage {
 
     const partToEncrypt = this._buffer.subarray(
       this._writePos - rsaSize,
-      rsaSize
+      this._writePos
     );
 
-    this._rsa.encrypt(partToEncrypt);
+    const encrypted = this._rsa.encrypt(partToEncrypt);
+
+    this._buffer.set(encrypted, this._writePos - rsaSize);
   }
 
   writeChecksum() {
@@ -131,7 +134,7 @@ export default class OutputMessage {
       this._messageSize
     );
 
-    const checksum = adler32(checksumAbleBuffer, checksumAbleBuffer.length);
+    const checksum = adler32(checksumAbleBuffer);
 
     assert(this._headerPos - 4 >= 0);
 

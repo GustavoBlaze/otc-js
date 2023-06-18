@@ -30,6 +30,14 @@ export default class Protocol {
 
   private _xteaKey: Buffer = Buffer.alloc(4 * 4); // 32 bits (4 bytes)  * 4 = 128 bits (16 bytes)
 
+  get host() {
+    return this._host;
+  }
+
+  get port() {
+    return this._port;
+  }
+
   get isConnected() {
     return this._connected;
   }
@@ -91,7 +99,7 @@ export default class Protocol {
     this._socket.connect(port, host, this.handleConnect.bind(this));
   }
 
-  private handleConnect() {
+  protected handleConnect() {
     this._connected = true;
     this._connecting = false;
 
@@ -172,8 +180,10 @@ export default class Protocol {
       );
     }
 
-    // dispatch this._inputMessage to the handler
+    this.onReceive(this._inputMessage);
   }
+
+  protected onReceive(message: InputMessage): void {}
 
   send(outputMessage: OutputMessage) {
     if (this._xteaEncryptionEnabled) {

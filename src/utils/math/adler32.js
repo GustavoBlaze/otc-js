@@ -1,4 +1,5 @@
-export function adler32(buffer, size) {
+export function adler32(buffer) {
+  let size = buffer.length;
   let a = 1;
   let b = 0;
   let i = 0;
