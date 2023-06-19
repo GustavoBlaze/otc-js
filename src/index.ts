@@ -4,32 +4,36 @@ import { ProtocolLogin } from "./net";
 import { RSA } from "./utils/crypt";
 
 import GameFeatureManager from "./client/GameFeatureManager";
+import ThingTypeManager from "./client/ThingTypeManager";
 
 dotenv.config();
 
-const host = process.env.HOST;
-const port = Number(process.env.PORT) || 7171;
+const CLIENT_VERSION = 1097;
+const featureManager = new GameFeatureManager();
+featureManager.setupFeaturesBasedOnClientVersion(CLIENT_VERSION);
+
+const thingTypeManager = new ThingTypeManager(featureManager, CLIENT_VERSION);
+
+function loadDat() {
+  const loadedDatSuccessfully = thingTypeManager.loadDat("./data/Tibia.dat");
+  console.log({ loadedDatSuccessfully });
+}
 
 function login() {
+  const host = process.env.HOST;
+  const port = Number(process.env.PORT) || 7171;
+
   const rsa = new RSA({
     n: process.env.RSA_N as string,
   });
 
-  const featureManager = new GameFeatureManager();
-
-  featureManager.setupFeaturesBasedOnClientVersion(1097);
-
-  const onCharacterList: ProtocolLogin["_onCharacterList"] = (
-    characters,
-    account
-  ) => {
-    console.log({
-      characters,
-      account,
-    });
-  };
-
-  const protocol = new ProtocolLogin({ featureManager, rsa, onCharacterList });
+  const protocol = new ProtocolLogin({
+    featureManager,
+    rsa,
+    onCharacterList: (character, account) => {
+      console.log({ character, account });
+    },
+  });
 
   protocol.login({
     // @ts-expect-error
@@ -40,4 +44,9 @@ function login() {
   });
 }
 
-login();
+function main() {
+  loadDat();
+  // login();
+}
+
+main();

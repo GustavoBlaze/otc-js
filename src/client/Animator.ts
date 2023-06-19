@@ -31,15 +31,15 @@ export default class Animator {
     return Math.floor(Math.random() * this._animationPhases);
   }
 
-  async unserialize(animationPhases: number, fileStream: FileStream) {
+  unserialize(animationPhases: number, fileStream: FileStream) {
     this._animationPhases = animationPhases;
-    this._async = (await fileStream.getU8()) === 0;
-    this._loopCount = await fileStream.get32();
-    this._startPhase = await fileStream.get8();
+    this._async = fileStream.getU8() === 0;
+    this._loopCount = fileStream.get32();
+    this._startPhase = fileStream.get8();
 
     for (let i = 0; i < animationPhases; i++) {
-      const min = await fileStream.getU32();
-      const max = await fileStream.getU32();
+      const min = fileStream.getU32();
+      const max = fileStream.getU32();
       this._phaseDurations.push([min, max]);
     }
 

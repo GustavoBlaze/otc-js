@@ -18,9 +18,9 @@ export default class ThingTypeManager {
 
   static _nullThingType = new ThingType();
 
-  constructor(featureManager: GameFeatureManager) {
+  constructor(featureManager: GameFeatureManager, clientVersion: number) {
     this._featureManager = featureManager;
-    this._clientVersion = 0;
+    this._clientVersion = clientVersion;
   }
 
   getThingType(id: number, category: ThingCategory) {
@@ -63,21 +63,22 @@ export default class ThingTypeManager {
     return this._contentRevision;
   }
 
-  async loadDat(file: string) {
+  loadDat(file: string) {
     this._datLoaded = false;
     this._datSignature = 0;
     this._contentRevision = 0;
 
     try {
       const fileStream = new FileStream();
-      await fileStream.open(file, "r");
+      fileStream.open(file, "r");
 
-      this._datSignature = await fileStream.getU32();
+      this._datSignature = fileStream.getU32();
+
       // this._contentRevision = cast 16 bits from datSignature
       this._contentRevision = this._datSignature & 0xffff;
 
       for (let i = 0; i < this._thingTypes.length; i++) {
-        const count = (await fileStream.getU16()) + 1;
+        const count = fileStream.getU16() + 1;
         this._thingTypes[i] = new Array<ThingType>(count);
       }
 
@@ -94,7 +95,8 @@ export default class ThingTypeManager {
 
         for (let id = firstId; id < this._thingTypes[category].length; id++) {
           const type = new ThingType();
-          await type.unserialize(
+
+          type.unserialize(
             id,
             category as ThingCategory,
             fileStream,

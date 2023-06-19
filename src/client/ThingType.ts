@@ -311,7 +311,7 @@ export default class ThingType {
     return this._animator;
   }
 
-  async unserialize(
+  unserialize(
     clientId: number,
     category: ThingCategory,
     fileStream: FileStream,
@@ -328,7 +328,7 @@ export default class ThingType {
 
     for (let i = 0; i < ThingAttr.ThingLastAttr; i++) {
       count++;
-      attr = await fileStream.getU8();
+      attr = fileStream.getU8();
 
       if (attr === ThingAttr.ThingLastAttr) {
         done = true;
@@ -336,7 +336,8 @@ export default class ThingType {
       }
 
       if (clientVersion >= 1000) {
-        attr = attr === 16 ? ThingAttr.ThingAttrNoMoveAnimation : attr - 1;
+        if (attr == 16) attr = ThingAttr.ThingAttrNoMoveAnimation;
+        else if (attr > 16) attr -= 1;
       } else if (clientVersion >= 860) {
         // no changes here
       } else if (clientVersion >= 780) {
@@ -375,8 +376,8 @@ export default class ThingType {
       switch (attr) {
         case ThingAttr.ThingAttrDisplacement: {
           if (clientVersion >= 755) {
-            this._displacement.x = await fileStream.getU16();
-            this._displacement.y = await fileStream.getU16();
+            this._displacement.x = fileStream.getU16();
+            this._displacement.y = fileStream.getU16();
           } else {
             this._displacement.x = 8;
             this._displacement.y = 8;
@@ -386,30 +387,30 @@ export default class ThingType {
           break;
         }
         case ThingAttr.ThingAttrLight: {
-          const light: Light = {
-            intensity: await fileStream.getU16(),
-            color: await fileStream.getU16(),
-          };
+          const light = {} as Light;
+
+          light.intensity = fileStream.getU16();
+          light.color = fileStream.getU16();
 
           this._attributes.set(attr, light);
           break;
         }
 
         case ThingAttr.ThingAttrMarket: {
-          const market: MarketData = {
-            category: await fileStream.getU16(),
-            tradeAs: await fileStream.getU16(),
-            showAs: await fileStream.getU16(),
-            name: await fileStream.getString(),
-            requiredLevel: await fileStream.getU16(),
-            restrictVocation: await fileStream.getU16(),
-          };
+          const market = {} as MarketData;
+
+          market.category = fileStream.getU16();
+          market.tradeAs = fileStream.getU16();
+          market.showAs = fileStream.getU16();
+          market.name = fileStream.getString();
+          market.restrictVocation = fileStream.getU16();
+          market.requiredLevel = fileStream.getU16();
 
           this._attributes.set(attr, market);
           break;
         }
         case ThingAttr.ThingAttrElevation: {
-          this._elevation = await fileStream.getU16();
+          this._elevation = fileStream.getU16();
           this._attributes.set(attr, this._elevation);
           break;
         }
@@ -420,7 +421,7 @@ export default class ThingType {
         case ThingAttr.ThingAttrMinimapColor:
         case ThingAttr.ThingAttrCloth:
         case ThingAttr.ThingAttrLensHelp: {
-          this._attributes.set(attr, await fileStream.getU16());
+          this._attributes.set(attr, fileStream.getU16());
           break;
         }
         default:
@@ -439,16 +440,17 @@ export default class ThingType {
       category === ThingCategory.ThingCategoryCreature &&
       featureManager.getFeature(GameFeature.GameIdleAnimations);
 
-    const groupCount = hasFrameGroup ? await fileStream.getU8() : 1;
+    const groupCount = hasFrameGroup ? fileStream.getU8() : 1;
     this._animationPhases = 0;
     let totalSpritesCount = 0;
 
     for (let i = 0; i < groupCount; i++) {
-      let frameGroupType = FrameGroupType.FrameGroupDefault;
-      if (hasFrameGroup) frameGroupType = await fileStream.getU8();
+      const frameGroupType = hasFrameGroup
+        ? fileStream.getU8()
+        : FrameGroupType.FrameGroupDefault;
 
-      const width = await fileStream.getU8();
-      const height = await fileStream.getU8();
+      const width = fileStream.getU8();
+      const height = fileStream.getU8();
 
       this._size = {
         width,
@@ -456,7 +458,7 @@ export default class ThingType {
       };
 
       if (width > 1 || height > 1) {
-        this._realSize = await fileStream.getU8();
+        this._realSize = fileStream.getU8();
         this._exactSize = Math.min(
           this._realSize,
           Math.max(width * 32, height * 32)
@@ -465,17 +467,17 @@ export default class ThingType {
         this._exactSize = 32;
       }
 
-      this._layers = await fileStream.getU8();
-      this._numPatternX = await fileStream.getU8();
-      this._numPatternY = await fileStream.getU8();
+      this._layers = fileStream.getU8();
+      this._numPatternX = fileStream.getU8();
+      this._numPatternY = fileStream.getU8();
 
       if (clientVersion >= 755) {
-        this._numPatternZ = await fileStream.getU8();
+        this._numPatternZ = fileStream.getU8();
       } else {
         this._numPatternZ = 1;
       }
 
-      const groupAnimationPhases = await fileStream.getU8();
+      const groupAnimationPhases = fileStream.getU8();
       this._animationPhases += groupAnimationPhases;
 
       if (
@@ -508,8 +510,8 @@ export default class ThingType {
         this._spritesIndex[j] = featureManager.getFeature(
           GameFeature.GameSpritesU32
         )
-          ? await fileStream.getU32()
-          : await fileStream.getU16();
+          ? fileStream.getU32()
+          : fileStream.getU16();
       }
 
       totalSpritesCount += totalSprites;

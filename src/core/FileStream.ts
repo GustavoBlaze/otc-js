@@ -1,104 +1,107 @@
-import fs from "node:fs/promises";
+import fs from "node:fs";
 import { Buffer } from "node:buffer";
 import { assert } from "node:console";
 
 type FileStreamMode = "r";
 
+type FileDescriptor = number;
+
 // Only for reading
 export default class FileStream {
-  private _file?: fs.FileHandle;
+  private _file?: FileDescriptor;
 
-  async open(file: string, mode: FileStreamMode = "r") {
-    this._file = await fs.open(file, mode);
+  open(file: string, mode: FileStreamMode = "r") {
+    this._file = fs.openSync(file, mode);
   }
 
-  async close() {
-    await this._file?.close();
+  close() {
+    this.isFileOpen();
+    fs.closeSync(this._file!);
   }
 
   isFileOpen() {
     assert(this._file, "Try to use a closed file stream");
   }
 
-  async getU8() {
+  getU8() {
     this.isFileOpen();
 
     const buffer = Buffer.allocUnsafe(1);
-    await this._file?.read(buffer, 0, 1);
+    fs.readSync(this._file!, buffer, 0, 1, null);
     return buffer.readUInt8(0);
   }
 
-  async getU16() {
+  getU16() {
     this.isFileOpen();
 
     const buffer = Buffer.allocUnsafe(2);
-    await this._file?.read(buffer, 0, 2);
+    fs.readSync(this._file!, buffer, 0, 2, null);
     return buffer.readUInt16LE(0);
   }
 
-  async getU32() {
+  getU32() {
     this.isFileOpen();
 
     const buffer = Buffer.allocUnsafe(4);
-    await this._file?.read(buffer, 0, 4);
+    fs.readSync(this._file!, buffer, 0, 4, null);
     return buffer.readUInt32LE(0);
   }
 
-  async getU64() {
+  getU64() {
     this.isFileOpen();
 
     const buffer = Buffer.allocUnsafe(8);
-    await this._file?.read(buffer, 0, 8);
+    fs.readSync(this._file!, buffer, 0, 8, null);
     return buffer.readBigUInt64LE(0);
   }
 
-  async get8() {
+  get8() {
     this.isFileOpen();
 
     const buffer = Buffer.allocUnsafe(1);
-    await this._file?.read(buffer, 0, 1);
+    fs.readSync(this._file!, buffer, 0, 1, null);
     return buffer.readInt8(0);
   }
 
-  async get16() {
+  get16() {
     this.isFileOpen();
 
     const buffer = Buffer.allocUnsafe(2);
-    await this._file?.read(buffer, 0, 2);
+    fs.readSync(this._file!, buffer, 0, 2, null);
     return buffer.readInt16LE(0);
   }
 
-  async get32() {
+  get32() {
     this.isFileOpen();
 
     const buffer = Buffer.allocUnsafe(4);
-    await this._file?.read(buffer, 0, 4);
+    fs.readSync(this._file!, buffer, 0, 4, null);
     return buffer.readInt32LE(0);
   }
 
-  async get64() {
+  get64() {
     this.isFileOpen();
 
     const buffer = Buffer.allocUnsafe(8);
-    await this._file?.read(buffer, 0, 8);
+    fs.readSync(this._file!, buffer, 0, 8, null);
     return buffer.readBigInt64LE(0);
   }
 
-  async getString() {
+  getString() {
     this.isFileOpen();
-    const len = await this.getU16();
+    const len = this.getU16();
 
-    if (len === 0 || len > 8192) {
+    if (len === 0 || len >= 8192) {
       throw new Error(`[FileStream]: Invalid string length (${len})`);
     }
 
     const buffer = Buffer.allocUnsafe(len);
-    await this._file?.read(buffer, 0, len);
+    fs.readSync(this._file!, buffer, 0, len, null);
     return buffer.toString("ascii"); // or UTF8? i don't know
   }
 
-  async read(buffer: Buffer, size: number) {
+  read(buffer: Buffer, size: number) {
     this.isFileOpen();
-    await this._file?.read(buffer, 0, size);
+    fs.readSync(this._file!, buffer, 0, size, null);
   }
 }
