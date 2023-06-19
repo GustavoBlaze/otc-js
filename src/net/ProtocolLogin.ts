@@ -143,10 +143,10 @@ export default class ProtocolLogin extends Protocol {
     }
 
     if (this._featureManager.getFeature(GameFeature.GameContentRevision)) {
-      msg.addU16(0); // todo: g_things.getContentRevision()
+      msg.addU16(0x4a10); // todo: g_things.getContentRevision()
       msg.addU16(0);
     } else {
-      msg.addU32(0); // todo: g_things.getDatSignature()
+      msg.addU32(0x4a10); // todo: g_things.getDatSignature()
     }
 
     msg.addU32(0); // todo: g_sprites.getSprSignature()

@@ -436,18 +436,19 @@ export default class ThingType {
       );
     }
 
-    const hasFrameGroup =
+    const hasFrameGroups =
       category === ThingCategory.ThingCategoryCreature &&
       featureManager.getFeature(GameFeature.GameIdleAnimations);
 
-    const groupCount = hasFrameGroup ? fileStream.getU8() : 1;
+    const groupCount = hasFrameGroups ? fileStream.getU8() : 1;
+
     this._animationPhases = 0;
     let totalSpritesCount = 0;
 
     for (let i = 0; i < groupCount; i++) {
       const frameGroupType = FrameGroupType.FrameGroupDefault;
 
-      if (hasFrameGroup) {
+      if (hasFrameGroups) {
         const frameGroupType = fileStream.getU8();
       }
 
