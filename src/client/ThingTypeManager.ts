@@ -67,9 +67,9 @@ export default class ThingTypeManager {
     this._datLoaded = false;
     this._datSignature = 0;
     this._contentRevision = 0;
+    const fileStream = new FileStream();
 
     try {
-      const fileStream = new FileStream();
       fileStream.open(file, "r");
 
       this._datSignature = fileStream.getU32();
@@ -111,6 +111,8 @@ export default class ThingTypeManager {
       return true;
     } catch (e) {
       console.error("Failed to read dat: ", e);
+      console.log(`Bytes read: ${fileStream.bytesRead}`);
+
       return false;
     }
   }

@@ -3,6 +3,8 @@ import { GameFeature } from "~/constants";
 export default class GameFeatureManager {
   private _features = new Map<GameFeature, boolean>();
 
+  private _clientVersion: number = 0;
+
   enableFeature(feature: GameFeature) {
     this._features.set(feature, true);
   }
@@ -189,5 +191,7 @@ export default class GameFeatureManager {
     if (version >= 1094) {
       this.enableFeature(GameFeature.GameAdditionalSkills);
     }
+
+    this._clientVersion = version;
   }
 }

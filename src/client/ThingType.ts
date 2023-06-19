@@ -445,9 +445,11 @@ export default class ThingType {
     let totalSpritesCount = 0;
 
     for (let i = 0; i < groupCount; i++) {
-      const frameGroupType = hasFrameGroup
-        ? fileStream.getU8()
-        : FrameGroupType.FrameGroupDefault;
+      const frameGroupType = FrameGroupType.FrameGroupDefault;
+
+      if (hasFrameGroup) {
+        const frameGroupType = fileStream.getU8();
+      }
 
       const width = fileStream.getU8();
       const height = fileStream.getU8();
@@ -502,16 +504,17 @@ export default class ThingType {
       }
 
       this._spritesIndex = new Array(totalSpritesCount + totalSprites);
+
       for (
         let j = totalSpritesCount;
         j < totalSpritesCount + totalSprites;
         j++
       ) {
-        this._spritesIndex[j] = featureManager.getFeature(
-          GameFeature.GameSpritesU32
-        )
-          ? fileStream.getU32()
-          : fileStream.getU16();
+        if (featureManager.getFeature(GameFeature.GameSpritesU32)) {
+          this._spritesIndex[j] = fileStream.getU32();
+        } else {
+          this._spritesIndex[j] = fileStream.getU16();
+        }
       }
 
       totalSpritesCount += totalSprites;

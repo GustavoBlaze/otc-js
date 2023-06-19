@@ -10,7 +10,14 @@ type FileDescriptor = number;
 export default class FileStream {
   private _file?: FileDescriptor;
 
+  private _bytesRead = 0;
+
+  get bytesRead() {
+    return this._bytesRead;
+  }
+
   open(file: string, mode: FileStreamMode = "r") {
+    this._bytesRead = 0;
     this._file = fs.openSync(file, mode);
   }
 
@@ -23,11 +30,18 @@ export default class FileStream {
     assert(this._file, "Try to use a closed file stream");
   }
 
+  private fsReadSync(buffer: Buffer, size: number) {
+    this.isFileOpen();
+    const bytesRead = fs.readSync(this._file!, buffer, 0, size, null);
+    this._bytesRead += bytesRead;
+    return bytesRead;
+  }
+
   getU8() {
     this.isFileOpen();
 
     const buffer = Buffer.allocUnsafe(1);
-    fs.readSync(this._file!, buffer, 0, 1, null);
+    this.fsReadSync(buffer, 1);
     return buffer.readUInt8(0);
   }
 
@@ -35,7 +49,7 @@ export default class FileStream {
     this.isFileOpen();
 
     const buffer = Buffer.allocUnsafe(2);
-    fs.readSync(this._file!, buffer, 0, 2, null);
+    this.fsReadSync(buffer, 2);
     return buffer.readUInt16LE(0);
   }
 
@@ -43,7 +57,7 @@ export default class FileStream {
     this.isFileOpen();
 
     const buffer = Buffer.allocUnsafe(4);
-    fs.readSync(this._file!, buffer, 0, 4, null);
+    this.fsReadSync(buffer, 4);
     return buffer.readUInt32LE(0);
   }
 
@@ -51,7 +65,7 @@ export default class FileStream {
     this.isFileOpen();
 
     const buffer = Buffer.allocUnsafe(8);
-    fs.readSync(this._file!, buffer, 0, 8, null);
+    this.fsReadSync(buffer, 8);
     return buffer.readBigUInt64LE(0);
   }
 
@@ -59,7 +73,7 @@ export default class FileStream {
     this.isFileOpen();
 
     const buffer = Buffer.allocUnsafe(1);
-    fs.readSync(this._file!, buffer, 0, 1, null);
+    this.fsReadSync(buffer, 1);
     return buffer.readInt8(0);
   }
 
@@ -67,7 +81,7 @@ export default class FileStream {
     this.isFileOpen();
 
     const buffer = Buffer.allocUnsafe(2);
-    fs.readSync(this._file!, buffer, 0, 2, null);
+    this.fsReadSync(buffer, 2);
     return buffer.readInt16LE(0);
   }
 
@@ -75,7 +89,7 @@ export default class FileStream {
     this.isFileOpen();
 
     const buffer = Buffer.allocUnsafe(4);
-    fs.readSync(this._file!, buffer, 0, 4, null);
+    this.fsReadSync(buffer, 4);
     return buffer.readInt32LE(0);
   }
 
@@ -83,7 +97,7 @@ export default class FileStream {
     this.isFileOpen();
 
     const buffer = Buffer.allocUnsafe(8);
-    fs.readSync(this._file!, buffer, 0, 8, null);
+    this.fsReadSync(buffer, 8);
     return buffer.readBigInt64LE(0);
   }
 
@@ -96,12 +110,12 @@ export default class FileStream {
     }
 
     const buffer = Buffer.allocUnsafe(len);
-    fs.readSync(this._file!, buffer, 0, len, null);
+    this.fsReadSync(buffer, len);
     return buffer.toString("ascii"); // or UTF8? i don't know
   }
 
   read(buffer: Buffer, size: number) {
     this.isFileOpen();
-    fs.readSync(this._file!, buffer, 0, size, null);
+    this.fsReadSync(buffer, size);
   }
 }
