@@ -69,7 +69,7 @@ export default class GameFeatureManager {
     }
 
     if (version >= 862) {
-      this.enableFeature(GameFeature.GamePenaltyOnDeath);
+      this.enableFeature(GameFeature.GamePenalityOnDeath);
     }
 
     if (version >= 870) {

@@ -2,7 +2,7 @@ export enum GameFeature {
   GameProtocolChecksum = 1,
   GameAccountNames = 2,
   GameChallengeOnLogin = 3,
-  GamePenaltyOnDeath = 4,
+  GamePenalityOnDeath = 4,
   GameNameOnNpcTrade = 5,
   GameDoubleFreeCapacity = 6,
   GameDoubleExperience = 7,

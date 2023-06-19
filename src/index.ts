@@ -8,14 +8,16 @@ import ThingTypeManager from "./client/ThingTypeManager";
 
 dotenv.config();
 
-const CLIENT_VERSION = 1097;
+const CLIENT_VERSION = 1096;
 const featureManager = new GameFeatureManager();
 featureManager.setupFeaturesBasedOnClientVersion(CLIENT_VERSION);
 
 const thingTypeManager = new ThingTypeManager(featureManager, CLIENT_VERSION);
 
 function loadDat() {
-  const loadedDatSuccessfully = thingTypeManager.loadDat("./data/Tibia.dat");
+  const loadedDatSuccessfully = thingTypeManager.loadDat(
+    `./data/${CLIENT_VERSION}/Tibia.dat`
+  );
   console.log({ loadedDatSuccessfully });
 }
 
