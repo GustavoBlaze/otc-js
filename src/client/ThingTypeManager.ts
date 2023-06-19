@@ -106,6 +106,7 @@ export default class ThingTypeManager {
           this._thingTypes[category][id] = type;
         }
       }
+      this._datLoaded = true;
       // Dispatch event to notify that dat has been loaded
       return true;
     } catch (e) {
