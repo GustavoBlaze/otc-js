@@ -498,7 +498,8 @@ export default class ThingType {
         this._layers *
         this._numPatternX *
         this._numPatternY *
-        this._numPatternZ;
+        this._numPatternZ *
+        groupAnimationPhases;
 
       if (totalSpritesCount + totalSprites > 4096) {
         throw new Error("A thing type has more than 4096 sprites");
@@ -511,11 +512,11 @@ export default class ThingType {
         j < totalSpritesCount + totalSprites;
         j++
       ) {
-        if (featureManager.getFeature(GameFeature.GameSpritesU32)) {
-          this._spritesIndex[j] = fileStream.getU32();
-        } else {
-          this._spritesIndex[j] = fileStream.getU16();
-        }
+        this._spritesIndex[j] = featureManager.getFeature(
+          GameFeature.GameSpritesU32
+        )
+          ? fileStream.getU32()
+          : fileStream.getU16();
       }
 
       totalSpritesCount += totalSprites;

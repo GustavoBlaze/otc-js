@@ -5,6 +5,10 @@ export default class GameFeatureManager {
 
   private _clientVersion: number = 0;
 
+  get clientVersion() {
+    return this._clientVersion;
+  }
+
   enableFeature(feature: GameFeature) {
     this._features.set(feature, true);
   }

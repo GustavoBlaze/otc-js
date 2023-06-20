@@ -8,7 +8,7 @@ import ThingTypeManager from "./client/ThingTypeManager";
 
 dotenv.config();
 
-const CLIENT_VERSION = 1096;
+const CLIENT_VERSION = 1097;
 const featureManager = new GameFeatureManager();
 featureManager.setupFeaturesBasedOnClientVersion(CLIENT_VERSION);
 
