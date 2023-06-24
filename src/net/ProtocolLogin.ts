@@ -64,6 +64,8 @@ interface ConstructorProps {
   rsa: RSA;
   onLoginError?: (error: string) => void;
   onCharacterList?: (characters: Character[], account: Account) => void;
+  datSignature: number;
+  contentRevision: number;
 }
 
 interface Login {
@@ -90,6 +92,10 @@ export default class ProtocolLogin extends Protocol {
 
   private _rsa: RSA;
 
+  private _contentRevision: number;
+
+  private _datSignature: number;
+
   private _onLoginError?: (error: string) => void;
 
   private _onCharacterList?: (
@@ -102,6 +108,8 @@ export default class ProtocolLogin extends Protocol {
     rsa,
     onLoginError,
     onCharacterList,
+    contentRevision,
+    datSignature,
   }: ConstructorProps) {
     super();
 
@@ -109,19 +117,19 @@ export default class ProtocolLogin extends Protocol {
     this._rsa = rsa;
     this._onLoginError = onLoginError;
     this._onCharacterList = onCharacterList;
+    this._contentRevision = contentRevision;
+    this._datSignature = datSignature;
   }
 
   login(data: Login): void {
     assert(data.host, "No host defined");
     assert(data.port, "No port defined");
     assert(data?.port > 0, "Invalid port");
-    assert(data.accountName, "No account defined");
-    assert(data.password, "No password defined");
 
     this._accountName = data.accountName;
     this._password = data.password;
     this._authenticatorToken = data.authenticatorToken;
-    this._stayLogged = data.stayLogged;
+    this._stayLogged = data.stayLogged ?? false;
 
     this.connect(data.host, data.port);
   }
@@ -136,20 +144,21 @@ export default class ProtocolLogin extends Protocol {
     const msg = new OutputMessage(this._rsa);
     msg.addU8(ClientOPCode.ClientEnterAccount);
     msg.addU16(11); // Linux
-    msg.addU16(1097);
+
+    msg.addU16(PROTOCOL_VERSION);
 
     if (this._featureManager.getFeature(GameFeature.GameClientVersion)) {
       msg.addU32(CLIENT_VERSION);
     }
 
     if (this._featureManager.getFeature(GameFeature.GameContentRevision)) {
-      msg.addU16(0x4a10); // todo: g_things.getContentRevision()
+      msg.addU16(this._contentRevision ?? 0);
       msg.addU16(0);
     } else {
-      msg.addU32(0x4a10); // todo: g_things.getDatSignature()
+      msg.addU32(this._datSignature ?? 0);
     }
 
-    msg.addU32(0); // todo: g_sprites.getSprSignature()
+    msg.addU32(1508150786); // todo: g_sprites.getSprSignature()
     msg.addU32(PIC_SIGNATURE);
 
     if (this._featureManager.getFeature(GameFeature.GamePreviewState)) {
@@ -163,7 +172,6 @@ export default class ProtocolLogin extends Protocol {
     ) {
       msg.addU8(0);
 
-      // xtea-key;
       this.generateXTEAKey();
       const key = this.getXTEAKeyDivided();
       msg.addU32(key[0]);
@@ -236,6 +244,12 @@ export default class ProtocolLogin extends Protocol {
     }
 
     this.send(msg);
+
+    if (
+      this._featureManager.getFeature(GameFeature.GameLoginPacketEncryption)
+    ) {
+      this.enableXTEAEncryption();
+    }
   }
 
   protected override onReceive(message: InputMessage): void {

@@ -59,7 +59,12 @@ export default class Protocol {
   }
 
   generateXTEAKey() {
-    this._xteaKey = randomBytes(32);
+    // this._xteaKey = randomBytes(32);
+    this._xteaKey = Buffer.alloc(32);
+    this._xteaKey.writeUInt32LE(0x0000000a, 0);
+    this._xteaKey.writeUInt32LE(0x0000000b, 4);
+    this._xteaKey.writeUInt32LE(0x0000000c, 8);
+    this._xteaKey.writeUInt32LE(0x0000000d, 12);
   }
 
   getXTEAKey() {
@@ -143,17 +148,16 @@ export default class Protocol {
 
     this._inputMessage.setHeaderSize(headerSize);
 
-    const messageSize = data.readUInt16LE(0);
-    const remainingData = data.subarray(2);
-
-    this.internalReceiveHeader(remainingData, messageSize);
+    this.internalReceiveHeader(data, 2);
   }
 
   private internalReceiveHeader(data: Buffer, size: number) {
     this._inputMessage.fillBuffer(data, size);
 
+    console.log("Internal receive header size: ", size);
+
     const remainingSize = this._inputMessage.readSize();
-    const remainingData = data.subarray(remainingSize);
+    const remainingData = data.subarray(2, remainingSize + 2);
 
     this.internalReceiveData(remainingData, remainingSize);
   }
@@ -166,18 +170,21 @@ export default class Protocol {
 
     this._inputMessage.fillBuffer(data, size);
 
-    if (this._checksumEnabled && !this._inputMessage.readChecksum()) {
-      console.log("[Protocol]: Got a network message with invalid checksum");
-      return;
+    if (this._checksumEnabled) {
+      const validChecksum = this._inputMessage.hasValidChecksum();
+      if (!validChecksum) {
+        console.log("[Protocol]: Got a network message with invalid checksum");
+        return;
+      }
     }
 
-    if (
-      this._xteaEncryptionEnabled &&
-      !XTEA.decrypt(this._inputMessage, this.getXTEAKey())
-    ) {
-      console.log(
-        "[Protocol]: Got a network message with invalid XTEA encryption"
-      );
+    if (this._xteaEncryptionEnabled) {
+      if (!XTEA.decrypt(this._inputMessage, this.getXTEAKey())) {
+        console.log(
+          "[Protocol]: Got a network message with invalid XTEA encryption"
+        );
+        return;
+      }
     }
 
     this.onReceive(this._inputMessage);
@@ -199,7 +206,7 @@ export default class Protocol {
     if (this._socket && this._connected) {
       const message = outputMessage.getHeaderBuffer();
 
-      this._socket.write(message);
+      this._socket.write(message.subarray(0, outputMessage.getMessageSize()));
     } else {
       console.log("[Protocol]: Tried to send a message while disconnected");
     }

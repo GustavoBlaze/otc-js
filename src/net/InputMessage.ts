@@ -7,7 +7,7 @@ const { adler32 } = bindings("adler32");
 const bufferMaxSize = 65536;
 const maxHeaderSize = 8;
 export default class InputMessage {
-  _buffer: Buffer = Buffer.allocUnsafe(bufferMaxSize);
+  _buffer: Buffer = Buffer.alloc(bufferMaxSize);
 
   _readPos: number = maxHeaderSize;
 
@@ -133,8 +133,9 @@ export default class InputMessage {
 
   fillBuffer(buffer: Buffer, size?: number) {
     const length = size ?? buffer.length;
+
     this.checkWrite(length);
-    buffer.copy(this._buffer, this._readPos, 0);
+    buffer.copy(this._buffer, this._readPos, 0, length);
     this._messageSize += length;
   }
 
@@ -144,11 +145,12 @@ export default class InputMessage {
     this._readPos = this._headerPos;
   }
 
-  readChecksum() {
+  hasValidChecksum() {
     const expectedCheck = this.getU32();
+
     const checksumAbleBuffer = this._buffer.subarray(
       this._readPos,
-      this.getUnreadSize()
+      this.getUnreadSize() + this._readPos
     );
 
     const actualCheck = adler32(checksumAbleBuffer);

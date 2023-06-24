@@ -18,7 +18,8 @@ function loadDat() {
   const loadedDatSuccessfully = thingTypeManager.loadDat(
     `./data/${CLIENT_VERSION}/Tibia.dat`
   );
-  console.log({ loadedDatSuccessfully });
+
+  return loadedDatSuccessfully;
 }
 
 function login() {
@@ -35,20 +36,26 @@ function login() {
     onCharacterList: (character, account) => {
       console.log({ character, account });
     },
+    contentRevision: 18960, // thingTypeManager.getContentRevision(),
+    datSignature: 18960, // thingTypeManager.getDatSignature(),
   });
 
   protocol.login({
     // @ts-expect-error
     host,
     port,
-    accountName: process.env.TEST_ACCOUNT_NAME as string,
-    password: process.env.TEST_ACCOUNT_PASSWORD as string,
+    accountName: process.env.TEST_ACCOUNT_NAME ?? "",
+    password: process.env.TEST_ACCOUNT_PASSWORD ?? "",
   });
 }
 
 function main() {
-  loadDat();
-  // login();
+  // const loadedDat = loadDat();
+  // if (!loadedDat) {
+  //   console.log("Failed to load .dat file");
+  //   return;
+  // }
+  login();
 }
 
 main();

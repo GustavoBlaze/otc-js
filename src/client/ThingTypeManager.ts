@@ -1,8 +1,10 @@
 import { FileStream } from "~/core";
 import { ThingAttr, ThingCategory } from "~/constants";
+import createLogger from "~/utils/logger";
 import ThingType from "./ThingType";
 import GameFeatureManager from "./GameFeatureManager";
 
+const logger = createLogger("ThingTypeManager");
 export default class ThingTypeManager {
   private _thingTypes = new Array<ThingType[]>(ThingCategory.ThingLastCategory);
 
@@ -64,6 +66,7 @@ export default class ThingTypeManager {
   }
 
   loadDat(file: string) {
+    logger.info(`Loading dat file: ${file}`);
     this._datLoaded = false;
     this._datSignature = 0;
     this._contentRevision = 0;
@@ -107,11 +110,12 @@ export default class ThingTypeManager {
         }
       }
       this._datLoaded = true;
+      logger.info(`Dat file loaded successfully`);
       // Dispatch event to notify that dat has been loaded
       return true;
     } catch (e) {
-      console.error("Failed to read dat: ", e);
-      console.log(`Bytes read: ${fileStream.bytesRead}`);
+      logger.error("Failed to read dat: ", e);
+      logger.log(`Bytes read: ${fileStream.bytesRead}`);
 
       return false;
     }
