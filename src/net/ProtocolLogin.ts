@@ -64,6 +64,9 @@ interface ConstructorProps {
   rsa: RSA;
   onLoginError?: (error: string) => void;
   onCharacterList?: (characters: Character[], account: Account) => void;
+  onMotd?: (motd: string) => void;
+  onSessionKey?: (sessionKey: string) => void;
+  onUpdateNeeded?: (signature: string) => void;
   datSignature: number;
   contentRevision: number;
 }
@@ -103,6 +106,12 @@ export default class ProtocolLogin extends Protocol {
     account: Account
   ) => void;
 
+  private _onMotd?: (motd: string) => void;
+
+  private _onSessionKey?: (sessionKey: string) => void;
+
+  private _onUpdateNeeded?: (signature: string) => void;
+
   constructor({
     featureManager,
     rsa,
@@ -110,6 +119,9 @@ export default class ProtocolLogin extends Protocol {
     onCharacterList,
     contentRevision,
     datSignature,
+    onMotd,
+    onSessionKey,
+    onUpdateNeeded,
   }: ConstructorProps) {
     super();
 
@@ -119,6 +131,9 @@ export default class ProtocolLogin extends Protocol {
     this._onCharacterList = onCharacterList;
     this._contentRevision = contentRevision;
     this._datSignature = datSignature;
+    this._onMotd = onMotd;
+    this._onSessionKey = onSessionKey;
+    this._onUpdateNeeded = onUpdateNeeded;
   }
 
   login(data: Login): void {
@@ -282,6 +297,17 @@ export default class ProtocolLogin extends Protocol {
         case LoginServerOPCode.CharacterList:
           this.parseCharacterList(message);
           break;
+        case LoginServerOPCode.ExtendedCharacterList:
+          // TODO
+          break;
+        case LoginServerOPCode.Update: {
+          this.parseUpdateNeeded(message);
+          break;
+        }
+        case LoginServerOPCode.SessionKey:
+          this.parseSessionKey(message);
+          break;
+
         default: {
           logger.warn(`Invalid opcode ${opcode}`);
         }
@@ -297,7 +323,7 @@ export default class ProtocolLogin extends Protocol {
 
   private parseMotd(message: InputMessage) {
     const motd = message.getString();
-    logger.info(motd);
+    this._onMotd?.(motd);
   }
 
   private parseCharacterList(message: InputMessage) {
@@ -368,5 +394,15 @@ export default class ProtocolLogin extends Protocol {
     }
 
     this._onCharacterList?.(characters, account);
+  }
+
+  private parseSessionKey(message: InputMessage) {
+    const sessionKey = message.getString();
+    this._onSessionKey?.(sessionKey);
+  }
+
+  private parseUpdateNeeded(message: InputMessage) {
+    const signature = message.getString();
+    this._onUpdateNeeded?.(signature);
   }
 }
