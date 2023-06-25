@@ -18,5 +18,5 @@ export function adler32(buffer) {
     b %= 65521;
   }
 
-  return (b << 16) | a;
+  return ((b << 16) | a) >>> 0;
 }
