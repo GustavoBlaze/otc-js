@@ -63,7 +63,12 @@ export default class Protocol {
   }
 
   getXTEAKey() {
-    return Uint32Array.from(this._xteaKey);
+    return Uint32Array.from([
+      this._xteaKey.readUInt32LE(0),
+      this._xteaKey.readUInt32LE(4),
+      this._xteaKey.readUInt32LE(8),
+      this._xteaKey.readUInt32LE(12),
+    ]);
   }
 
   disconnect() {

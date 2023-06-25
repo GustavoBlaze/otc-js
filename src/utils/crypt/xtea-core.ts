@@ -9,8 +9,8 @@ export function decrypt({ data, key }: Props) {
   let readPos = 0;
 
   while (readPos < data.length) {
-    let v0 = data.readUInt32BE(readPos);
-    let v1 = data.readUInt32BE(readPos + 4);
+    let v0 = data.readUInt32LE(readPos) >>> 0;
+    let v1 = data.readUInt32LE(readPos + 4) >>> 0;
 
     let sum = 0xc6ef3720;
 
@@ -23,8 +23,8 @@ export function decrypt({ data, key }: Props) {
       v0 >>>= 0;
     }
 
-    data.writeUInt32BE(v0, readPos);
-    data.writeUInt32BE(v1, readPos + 4);
+    data.writeUInt32LE(v0, readPos);
+    data.writeUInt32LE(v1, readPos + 4);
     readPos += 2 * 4;
   }
 }
@@ -33,8 +33,8 @@ export function encrypt({ data, key }: Props) {
   let readPos = 0;
 
   while (readPos < data.length) {
-    let v0 = data.readUInt32BE(readPos);
-    let v1 = data.readUInt32BE(readPos + 4);
+    let v0 = data.readUInt32LE(readPos);
+    let v1 = data.readUInt32LE(readPos + 4);
 
     let sum = 0;
 
@@ -47,8 +47,8 @@ export function encrypt({ data, key }: Props) {
       v1 >>>= 0;
     }
 
-    data.writeUInt32BE(v0, readPos);
-    data.writeUInt32BE(v1, readPos + 4);
+    data.writeUInt32LE(v0, readPos);
+    data.writeUInt32LE(v1, readPos + 4);
     readPos += 2 * 4;
   }
 }

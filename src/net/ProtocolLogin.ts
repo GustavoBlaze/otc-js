@@ -174,6 +174,7 @@ export default class ProtocolLogin extends Protocol {
 
       this.generateXTEAKey();
       const key = this.getXTEAKey();
+
       msg.addU32(key[0]);
       msg.addU32(key[1]);
       msg.addU32(key[2]);

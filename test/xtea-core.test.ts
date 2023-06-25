@@ -4,7 +4,7 @@ import assert from "node:assert";
 import { randomBytes } from "node:crypto";
 import * as XTEA from "../src/utils/crypt/xtea-core";
 
-const key = randomBytes(32);
+const randomKey = randomBytes(16);
 const strToEncrypt = "This string must be % 8 == 0";
 
 {
@@ -22,8 +22,14 @@ const strToEncrypt = "This string must be % 8 == 0";
   console.log("\t- Encrypting...");
   {
     const data = Buffer.from(bufferToEncrypt);
+    const key = Uint32Array.from([
+      randomKey.readUInt32LE(0),
+      randomKey.readUInt32LE(4),
+      randomKey.readUInt32LE(8),
+      randomKey.readUInt32LE(12),
+    ]);
 
-    XTEA.encrypt({ data, key: Uint32Array.from(key) });
+    XTEA.encrypt({ data, key });
     encryptedBuffer = data;
   }
 
@@ -33,7 +39,14 @@ const strToEncrypt = "This string must be % 8 == 0";
   {
     const data = Buffer.from(encryptedBuffer);
 
-    XTEA.decrypt({ data, key: Uint32Array.from(key) });
+    const key = Uint32Array.from([
+      randomKey.readUInt32LE(0),
+      randomKey.readUInt32LE(4),
+      randomKey.readUInt32LE(8),
+      randomKey.readUInt32LE(12),
+    ]);
+
+    XTEA.decrypt({ data, key });
 
     decryptedBuffer = data;
   }
