@@ -1,8 +1,6 @@
 import { Buffer } from "node:buffer";
 import assert from "node:assert";
-import bindings from "bindings";
-
-const { adler32 } = bindings("adler32");
+import { adler32 } from "~/utils/math";
 
 const bufferMaxSize = 65536;
 const maxHeaderSize = 8;
