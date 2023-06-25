@@ -1,0 +1,1 @@
+import "./xtea-core.test";

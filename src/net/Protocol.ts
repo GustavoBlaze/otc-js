@@ -59,27 +59,11 @@ export default class Protocol {
   }
 
   generateXTEAKey() {
-    // this._xteaKey = randomBytes(32);
-    this._xteaKey = Buffer.alloc(32);
-    this._xteaKey.writeUInt32LE(0x0000000a, 0);
-    this._xteaKey.writeUInt32LE(0x0000000b, 4);
-    this._xteaKey.writeUInt32LE(0x0000000c, 8);
-    this._xteaKey.writeUInt32LE(0x0000000d, 12);
+    this._xteaKey = randomBytes(16);
   }
 
   getXTEAKey() {
-    return this._xteaKey;
-  }
-
-  getXTEAKeyDivided() {
-    const key = Uint32Array.from([
-      this._xteaKey.readUint32LE(0),
-      this._xteaKey.readUint32LE(4),
-      this._xteaKey.readUint32LE(8),
-      this._xteaKey.readUint32LE(12),
-    ]);
-
-    return key;
+    return Uint32Array.from(this._xteaKey);
   }
 
   disconnect() {
@@ -153,8 +137,6 @@ export default class Protocol {
 
   private internalReceiveHeader(data: Buffer, size: number) {
     this._inputMessage.fillBuffer(data, size);
-
-    console.log("Internal receive header size: ", size);
 
     const remainingSize = this._inputMessage.readSize();
     const remainingData = data.subarray(2, remainingSize + 2);

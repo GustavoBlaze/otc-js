@@ -19,6 +19,10 @@ export default class InputMessage {
     this.reset();
   }
 
+  setMessageSize(size: number) {
+    this._messageSize = size;
+  }
+
   reset() {
     this._readPos = maxHeaderSize;
     this._headerPos = maxHeaderSize;
@@ -119,7 +123,10 @@ export default class InputMessage {
   }
 
   getReadBuffer() {
-    return this._buffer.subarray(this._readPos);
+    return this._buffer.subarray(
+      this._readPos,
+      this.getUnreadSize() + this._readPos
+    );
   }
 
   readSize() {
