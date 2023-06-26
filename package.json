@@ -1,13 +1,15 @@
 {
   "name": "otc-js",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "license": "MIT",
   "scripts": {
     "build": "tsc",
     "dev": "ts-node -r tsconfig-paths/register src/index.dev.ts",
     "lint": "yarn eslint ./src/**/*.ts ./src/**/*.js",
     "lint-fix": "yarn lint --fix",
-    "test": "ts-node -r tsconfig-paths/register ./src/test/index.ts"
+    "test": "ts-node -r tsconfig-paths/register ./src/test/index.ts",
+    "prepub": "rm -rf dist && tsc && cp package*.json dist",
+    "pub": "cd ./dist && npm adduser && npm publish --access public"
   },
   "dependencies": {
     "dotenv": "^16.0.1",
