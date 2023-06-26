@@ -2,7 +2,7 @@
 /* eslint-disable no-undef */
 import assert from "node:assert";
 import { randomBytes } from "node:crypto";
-import * as XTEA from "../src/utils/crypt/xtea-core";
+import * as XTEA from "../utils/crypt/xtea-core";
 
 const randomKey = randomBytes(16);
 const strToEncrypt = "This string must be % 8 == 0";
