@@ -38,6 +38,7 @@ function login() {
     },
     contentRevision: 18960, // thingTypeManager.getContentRevision(),
     datSignature: 18960, // thingTypeManager.getDatSignature(),
+    clientVersion: CLIENT_VERSION,
   });
 
   protocol.login({

@@ -10,8 +10,6 @@ import InputMessage from "./InputMessage";
 
 const logger = createLogger("ProtocolLogin");
 
-const PROTOCOL_VERSION = 1097;
-const CLIENT_VERSION = 1097;
 const PIC_SIGNATURE = 0x56c5dde7;
 
 type World = {
@@ -69,6 +67,7 @@ interface ConstructorProps {
   onUpdateNeeded?: (signature: string) => void;
   datSignature: number;
   contentRevision: number;
+  clientVersion: number;
 }
 
 interface Login {
@@ -112,6 +111,8 @@ export default class ProtocolLogin extends Protocol {
 
   private _onUpdateNeeded?: (signature: string) => void;
 
+  private _clientVersion: number;
+
   constructor({
     featureManager,
     rsa,
@@ -122,6 +123,7 @@ export default class ProtocolLogin extends Protocol {
     onMotd,
     onSessionKey,
     onUpdateNeeded,
+    clientVersion,
   }: ConstructorProps) {
     super();
 
@@ -134,6 +136,7 @@ export default class ProtocolLogin extends Protocol {
     this._onMotd = onMotd;
     this._onSessionKey = onSessionKey;
     this._onUpdateNeeded = onUpdateNeeded;
+    this._clientVersion = clientVersion;
   }
 
   login(data: Login): void {
@@ -160,10 +163,10 @@ export default class ProtocolLogin extends Protocol {
     msg.addU8(ClientOPCode.ClientEnterAccount);
     msg.addU16(11); // Linux
 
-    msg.addU16(PROTOCOL_VERSION);
+    msg.addU16(this._clientVersion); // protocol version but usually it is the same as client version
 
     if (this._featureManager.getFeature(GameFeature.GameClientVersion)) {
-      msg.addU32(CLIENT_VERSION);
+      msg.addU32(this._clientVersion);
     }
 
     if (this._featureManager.getFeature(GameFeature.GameContentRevision)) {
@@ -226,7 +229,7 @@ export default class ProtocolLogin extends Protocol {
       msg.addU8(1); // unknown
       msg.addU8(1); // unknown
 
-      if (CLIENT_VERSION >= 1072) {
+      if (this._clientVersion >= 1072) {
         msg.addString("vendor renderer"); // todo: g_graphics.getVendor(), g_graphics.getRenderer()
       } else {
         msg.addString("renderer"); // todo: g_graphics.getRenderer()
@@ -329,7 +332,7 @@ export default class ProtocolLogin extends Protocol {
   private parseCharacterList(message: InputMessage) {
     const characters: Character[] = [];
 
-    if (CLIENT_VERSION > 1010) {
+    if (this._clientVersion > 1010) {
       const worlds: Record<number, World> = {};
 
       const worldsCount = message.getU8();
@@ -376,7 +379,7 @@ export default class ProtocolLogin extends Protocol {
 
     const account: Account = {} as Account;
 
-    if (PROTOCOL_VERSION > 1077) {
+    if (this._clientVersion > 1077) {
       account.status = message.getU8();
       account.subStatus = message.getU8();
       account.premiumDays = message.getU32();

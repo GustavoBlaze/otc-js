@@ -1,9 +1,8 @@
 import { Buffer } from "node:buffer";
-import bindings from "bindings";
 import type { RSA } from "~/utils/crypt";
 import assert from "node:assert";
+import { adler32 } from "~/utils/math";
 
-const { adler32 } = bindings("adler32");
 const bufferMaxSize = 65536;
 const maxStringSize = 65536;
 const maxHeaderSize = 8;

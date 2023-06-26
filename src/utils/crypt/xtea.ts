@@ -1,4 +1,3 @@
-import type { Buffer } from "node:buffer";
 import OutputMessage from "~/net/OutputMessage";
 import InputMessage from "~/net/InputMessage";
 
