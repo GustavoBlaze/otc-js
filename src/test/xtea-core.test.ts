@@ -51,10 +51,7 @@ const strToEncrypt = "This string must be % 8 == 0";
     decryptedBuffer = data;
   }
 
-  assert(
-    bufferToEncrypt.toString() === decryptedBuffer.toString(),
-    "Invalid decrypted buffer"
-  );
+  assert(bufferToEncrypt.toString() === decryptedBuffer.toString(), "Invalid decrypted buffer");
 
   console.log("\t- Test passed!\n");
 }

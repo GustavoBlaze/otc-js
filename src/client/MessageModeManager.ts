@@ -123,19 +123,11 @@ export default class MessageModeManager {
       this._modes.set(MessageMode.MessageThankyou, 40);
       this._modes.set(MessageMode.MessageMarket, 41);
     } else if (version >= 1036) {
-      for (
-        let i = MessageMode.MessageNone;
-        i <= MessageMode.MessageBeyondLast;
-        ++i
-      ) {
+      for (let i = MessageMode.MessageNone; i <= MessageMode.MessageBeyondLast; ++i) {
         this._modes.set(i, i >= MessageMode.MessageNpcTo ? i + 1 : i);
       }
     } else if (version >= 900) {
-      for (
-        let i = MessageMode.MessageNone;
-        i <= MessageMode.MessageBeyondLast;
-        ++i
-      ) {
+      for (let i = MessageMode.MessageNone; i <= MessageMode.MessageBeyondLast; ++i) {
         this._modes.set(i, i);
       }
     } else if (version >= 861) {

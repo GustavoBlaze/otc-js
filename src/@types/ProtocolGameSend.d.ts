@@ -32,13 +32,7 @@ export interface IProtocolGameSend {
   sendTurnSouth(): void;
   sendTurnWest(): void;
   sendEquipItem(itemId: number, countOrSubType: number): void;
-  sendMove(
-    fromPos: Position,
-    thingId: number,
-    stackpos: number,
-    toPos: Position,
-    count: number
-  ): void;
+  sendMove(fromPos: Position, thingId: number, stackpos: number, toPos: Position, count: number): void;
   sendInspectNpcTrade(itemId: number, count: number): void;
   sendBuyItem(
     itemId: number,
@@ -47,28 +41,13 @@ export interface IProtocolGameSend {
     ignoreCapacity: boolean,
     buyWithBackpack: boolean
   ): void;
-  sendSellItem(
-    itemId: number,
-    subType: number,
-    amount: number,
-    ignoreEquipped: boolean
-  ): void;
+  sendSellItem(itemId: number, subType: number, amount: number, ignoreEquipped: boolean): void;
   sendCloseNpcTrade(): void;
-  sendRequestTrade(
-    pos: Position,
-    thingId: number,
-    stackpos: number,
-    creatureId: number
-  ): void;
+  sendRequestTrade(pos: Position, thingId: number, stackpos: number, creatureId: number): void;
   sendInspectTrade(counterOffer: boolean, index: number): void;
   sendAcceptTrade(): void;
   sendRejectTrade(): void;
-  sendUseItem(
-    position: Position,
-    itemId: number,
-    stackpos: number,
-    index: number
-  ): void;
+  sendUseItem(position: Position, itemId: number, stackpos: number, index: number): void;
   sendUseItemWith(
     fromPos: Position,
     itemId: number,
@@ -77,12 +56,7 @@ export interface IProtocolGameSend {
     toThingId: number,
     toStackPos: number
   ): void;
-  sendUseOnCreature(
-    pos: Position,
-    thingId: number,
-    stackpos: number,
-    creatureId: number
-  ): void;
+  sendUseOnCreature(pos: Position, thingId: number, stackpos: number, creatureId: number): void;
   sendRotateItem(pos: Position, thingId: number, stackpos: number): void;
   sendCloseContainer(containerId: number): void;
   sendUpContainer(containerId: number): void;

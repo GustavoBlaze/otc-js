@@ -26,10 +26,7 @@ export default class ThingTypeManager {
   }
 
   getThingType(id: number, category: ThingCategory) {
-    if (
-      category >= ThingCategory.ThingLastCategory ||
-      id >= this._thingTypes[category]?.length
-    ) {
+    if (category >= ThingCategory.ThingLastCategory || id >= this._thingTypes[category]?.length) {
       console.error(
         `[ThingTypeManager]: getThingType: invalid id or category. Id:${id} Category:${category}`
       );
@@ -85,11 +82,7 @@ export default class ThingTypeManager {
         this._thingTypes[i] = new Array<ThingType>(count);
       }
 
-      for (
-        let category = 0;
-        category < ThingCategory.ThingLastCategory;
-        category++
-      ) {
+      for (let category = 0; category < ThingCategory.ThingLastCategory; category++) {
         let firstId = 1;
 
         if (category === ThingCategory.ThingCategoryItem) {

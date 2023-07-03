@@ -22,10 +22,8 @@ const DIRECTION_MAP: Record<Direction, number> = {
   [Direction.InvalidDirection]: 0,
 };
 
-export default class ProtocolGame
-  extends Protocol
-  implements ProtocolGameParseAndSend
-{
+// @ts-expect-error
+export default class ProtocolGame extends Protocol implements ProtocolGameParseAndSend {
   private _accountName?: string;
 
   private _accountPassword?: string;
@@ -164,13 +162,7 @@ export default class ProtocolGame
     this.send(msg);
   }
 
-  sendMove(
-    fromPos: Position,
-    thingId: number,
-    stackPos: number,
-    toPos: Position,
-    count: number
-  ): void {
+  sendMove(fromPos: Position, thingId: number, stackPos: number, toPos: Position, count: number): void {
     const msg = new OutputMessage();
     msg.addU8(ClientOPCode.Move);
     ProtocolGame.addPosition(msg, fromPos);
@@ -206,20 +198,13 @@ export default class ProtocolGame
     this.send(msg);
   }
 
-  sendSellItem(
-    itemId: number,
-    subType: number,
-    amount: number,
-    ignoreEquipped: boolean
-  ) {
+  sendSellItem(itemId: number, subType: number, amount: number, ignoreEquipped: boolean) {
     const msg = new OutputMessage();
     msg.addU8(ClientOPCode.SellItem);
     msg.addU16(itemId);
     msg.addU8(subType);
 
-    if (
-      this._featureManager?.getFeature(GameFeature.GameDoubleShopSellAmount)
-    ) {
+    if (this._featureManager?.getFeature(GameFeature.GameDoubleShopSellAmount)) {
       msg.addU16(amount);
     } else {
       msg.addU8(amount);

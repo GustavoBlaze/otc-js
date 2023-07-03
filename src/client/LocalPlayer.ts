@@ -154,10 +154,7 @@ export default class LocalPlayer extends Player {
   }
 
   setMagicLevel(magicLevel: double, magicLevelPercent: double) {
-    if (
-      magicLevel === this._magicLevel &&
-      magicLevelPercent === this._magicLevelPercent
-    ) {
+    if (magicLevel === this._magicLevel && magicLevelPercent === this._magicLevelPercent) {
       return;
     }
 

@@ -97,9 +97,7 @@ export default class Protocol {
     this._connected = true;
     this._connecting = false;
 
-    console.log(
-      `[Protocol]: Connected to ${this._host}:${this._port} successfully`
-    );
+    console.log(`[Protocol]: Connected to ${this._host}:${this._port} successfully`);
   }
 
   private handleSocketTimeout() {
@@ -113,9 +111,7 @@ export default class Protocol {
     this._connected = false;
     this._connecting = false;
 
-    console.log(
-      `[Protocol]: Socket close ${hadError ? "with error" : "without error"}`
-    );
+    console.log(`[Protocol]: Socket close ${hadError ? "with error" : "without error"}`);
   }
 
   private handleSocketError(error: Error) {
@@ -167,9 +163,7 @@ export default class Protocol {
 
     if (this._xteaEncryptionEnabled) {
       if (!XTEA.decrypt(this._inputMessage, this.getXTEAKey())) {
-        console.log(
-          "[Protocol]: Got a network message with invalid XTEA encryption"
-        );
+        console.log("[Protocol]: Got a network message with invalid XTEA encryption");
         return;
       }
     }

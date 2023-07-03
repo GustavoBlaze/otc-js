@@ -100,10 +100,7 @@ export default class ProtocolLogin extends Protocol {
 
   private _onLoginError?: (error: string) => void;
 
-  private _onCharacterList?: (
-    characters: Character[],
-    account: Account
-  ) => void;
+  private _onCharacterList?: (characters: Character[], account: Account) => void;
 
   private _onMotd?: (motd: string) => void;
 
@@ -185,9 +182,7 @@ export default class ProtocolLogin extends Protocol {
 
     let offset = msg.getMessageSize();
 
-    if (
-      this._featureManager.getFeature(GameFeature.GameLoginPacketEncryption)
-    ) {
+    if (this._featureManager.getFeature(GameFeature.GameLoginPacketEncryption)) {
       msg.addU8(0);
 
       this.generateXTEAKey();
@@ -219,9 +214,7 @@ export default class ProtocolLogin extends Protocol {
       msg.addU8(0);
     }
 
-    if (
-      this._featureManager.getFeature(GameFeature.GameLoginPacketEncryption)
-    ) {
+    if (this._featureManager.getFeature(GameFeature.GameLoginPacketEncryption)) {
       msg.encryptRSA();
     }
 
@@ -264,9 +257,7 @@ export default class ProtocolLogin extends Protocol {
 
     this.send(msg);
 
-    if (
-      this._featureManager.getFeature(GameFeature.GameLoginPacketEncryption)
-    ) {
+    if (this._featureManager.getFeature(GameFeature.GameLoginPacketEncryption)) {
       this.enableXTEAEncryption();
     }
   }
@@ -368,9 +359,7 @@ export default class ProtocolLogin extends Protocol {
           worldName: message.getString(),
           worldIp: ipToString(message.getU32()),
           worldPort: message.getU16(),
-          previewState: this._featureManager.getFeature(
-            GameFeature.GamePreviewState
-          )
+          previewState: this._featureManager.getFeature(GameFeature.GamePreviewState)
             ? message.getU8()
             : undefined,
         });
@@ -390,10 +379,7 @@ export default class ProtocolLogin extends Protocol {
     } else {
       account.status = AccountStatus.Ok;
       account.premiumDays = message.getU16();
-      account.status =
-        account.premiumDays > 0
-          ? SubscriptionStatus.Premium
-          : SubscriptionStatus.Free;
+      account.status = account.premiumDays > 0 ? SubscriptionStatus.Premium : SubscriptionStatus.Free;
     }
 
     this._onCharacterList?.(characters, account);

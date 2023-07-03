@@ -105,11 +105,7 @@ export default class InputMessage {
   getString() {
     const length = this.getU16();
     this.checkRead(length);
-    const value = this._buffer.toString(
-      "ascii",
-      this._readPos,
-      this._readPos + length
-    );
+    const value = this._buffer.toString("ascii", this._readPos, this._readPos + length);
     this._readPos += length;
     return value;
   }
@@ -121,10 +117,7 @@ export default class InputMessage {
   }
 
   getReadBuffer() {
-    return this._buffer.subarray(
-      this._readPos,
-      this.getUnreadSize() + this._readPos
-    );
+    return this._buffer.subarray(this._readPos, this.getUnreadSize() + this._readPos);
   }
 
   readSize() {
@@ -153,10 +146,7 @@ export default class InputMessage {
   hasValidChecksum() {
     const expectedCheck = this.getU32();
 
-    const checksumAbleBuffer = this._buffer.subarray(
-      this._readPos,
-      this.getUnreadSize() + this._readPos
-    );
+    const checksumAbleBuffer = this._buffer.subarray(this._readPos, this.getUnreadSize() + this._readPos);
 
     const actualCheck = adler32(checksumAbleBuffer);
 

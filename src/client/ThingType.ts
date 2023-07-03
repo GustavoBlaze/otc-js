@@ -1,9 +1,4 @@
-import {
-  FrameGroupType,
-  GameFeature,
-  ThingAttr,
-  ThingCategory,
-} from "~/constants";
+import { FrameGroupType, GameFeature, ThingAttr, ThingCategory } from "~/constants";
 import { FileStream } from "~/core";
 import GameFeatureManager from "./GameFeatureManager";
 import Animator from "./Animator";
@@ -367,10 +362,8 @@ export default class ThingType {
         else if (attr == 28) attr = ThingAttr.ThingAttrAnimateAlways;
 
         /* "Multi Use" and "Force Use" are swapped */
-        if (attr == ThingAttr.ThingAttrMultiUse)
-          attr = ThingAttr.ThingAttrForceUse;
-        else if (attr == ThingAttr.ThingAttrForceUse)
-          attr = ThingAttr.ThingAttrMultiUse;
+        if (attr == ThingAttr.ThingAttrMultiUse) attr = ThingAttr.ThingAttrForceUse;
+        else if (attr == ThingAttr.ThingAttrForceUse) attr = ThingAttr.ThingAttrMultiUse;
       }
 
       switch (attr) {
@@ -462,10 +455,7 @@ export default class ThingType {
 
       if (width > 1 || height > 1) {
         this._realSize = fileStream.getU8();
-        this._exactSize = Math.min(
-          this._realSize,
-          Math.max(width * 32, height * 32)
-        );
+        this._exactSize = Math.min(this._realSize, Math.max(width * 32, height * 32));
       } else {
         this._exactSize = 32;
       }
@@ -483,10 +473,7 @@ export default class ThingType {
       const groupAnimationPhases = fileStream.getU8();
       this._animationPhases += groupAnimationPhases;
 
-      if (
-        groupAnimationPhases > 1 &&
-        featureManager.getFeature(GameFeature.GameEnhancedAnimations)
-      ) {
+      if (groupAnimationPhases > 1 && featureManager.getFeature(GameFeature.GameEnhancedAnimations)) {
         this._animator = new Animator();
         this._animator.unserialize(groupAnimationPhases, fileStream);
       }
@@ -507,14 +494,8 @@ export default class ThingType {
 
       this._spritesIndex = new Array(totalSpritesCount + totalSprites);
 
-      for (
-        let j = totalSpritesCount;
-        j < totalSpritesCount + totalSprites;
-        j++
-      ) {
-        this._spritesIndex[j] = featureManager.getFeature(
-          GameFeature.GameSpritesU32
-        )
+      for (let j = totalSpritesCount; j < totalSpritesCount + totalSprites; j++) {
+        this._spritesIndex[j] = featureManager.getFeature(GameFeature.GameSpritesU32)
           ? fileStream.getU32()
           : fileStream.getU16();
       }
