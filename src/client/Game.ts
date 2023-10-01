@@ -1,12 +1,7 @@
 import { ChaseMode, Direction, FightMode, PVPMode } from "~/constants";
-import GameFeatureManager from "./GameFeatureManager";
-import MessageModeManager from "./MessageModeManager";
+import { g_feature, g_messageMode } from "./globals";
 
 export default class Game {
-  private _gameFeatureManager = new GameFeatureManager();
-
-  private _messageModeManager = new MessageModeManager();
-
   private _clientVersion = 0;
 
   private _protocolVersion = 0;
@@ -39,8 +34,8 @@ export default class Game {
   // private _openPVPSituations?: number;
   private _safeFight: boolean = false;
 
-  get features(): GameFeatureManager {
-    return this._gameFeatureManager;
+  get features() {
+    return g_feature;
   }
 
   get isOnline(): Boolean {
@@ -75,6 +70,6 @@ export default class Game {
     }
 
     this._protocolVersion = version;
-    this._messageModeManager.buildMessageMode(version);
+    g_messageMode.buildMessageMode(version);
   }
 }

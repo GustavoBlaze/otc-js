@@ -1,7 +1,7 @@
 import { FrameGroupType, GameFeature, ThingAttr, ThingCategory } from "~/constants";
 import { FileStream } from "~/core";
-import GameFeatureManager from "./GameFeatureManager";
 import Animator from "./Animator";
+import { g_feature } from "./globals";
 
 type ThingTypeAttribute = Boolean | Number | Light | MarketData;
 export default class ThingType {
@@ -306,13 +306,7 @@ export default class ThingType {
     return this._animator;
   }
 
-  unserialize(
-    clientId: number,
-    category: ThingCategory,
-    fileStream: FileStream,
-    featureManager: GameFeatureManager,
-    clientVersion: number
-  ) {
+  unserialize(clientId: number, category: ThingCategory, fileStream: FileStream, clientVersion: number) {
     this._null = false;
     this._id = clientId;
     this._category = category;
@@ -431,7 +425,7 @@ export default class ThingType {
 
     const hasFrameGroups =
       category === ThingCategory.ThingCategoryCreature &&
-      featureManager.getFeature(GameFeature.GameIdleAnimations);
+      g_feature.getFeature(GameFeature.GameIdleAnimations);
 
     const groupCount = hasFrameGroups ? fileStream.getU8() : 1;
 
@@ -473,7 +467,7 @@ export default class ThingType {
       const groupAnimationPhases = fileStream.getU8();
       this._animationPhases += groupAnimationPhases;
 
-      if (groupAnimationPhases > 1 && featureManager.getFeature(GameFeature.GameEnhancedAnimations)) {
+      if (groupAnimationPhases > 1 && g_feature.getFeature(GameFeature.GameEnhancedAnimations)) {
         this._animator = new Animator();
         this._animator.unserialize(groupAnimationPhases, fileStream);
       }
@@ -495,7 +489,7 @@ export default class ThingType {
       this._spritesIndex = new Array(totalSpritesCount + totalSprites);
 
       for (let j = totalSpritesCount; j < totalSpritesCount + totalSprites; j++) {
-        this._spritesIndex[j] = featureManager.getFeature(GameFeature.GameSpritesU32)
+        this._spritesIndex[j] = g_feature.getFeature(GameFeature.GameSpritesU32)
           ? fileStream.getU32()
           : fileStream.getU16();
       }

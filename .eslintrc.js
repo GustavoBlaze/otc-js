@@ -26,6 +26,7 @@ module.exports = {
   },
   plugins: ["@typescript-eslint", "prettier", "import"],
   rules: {
+    camelcase: ["error", { allow: ["g_"] }],
     "no-debugger": "off",
     "prettier/prettier": "error",
     "no-underscore-dangle": "off",
