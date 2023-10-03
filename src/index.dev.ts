@@ -3,21 +3,18 @@ import process from "node:process";
 import { ProtocolLogin } from "./net";
 import { RSA } from "./utils/crypt";
 
-import GameFeatureManager from "./client/GameFeatureManager";
 import ThingTypeManager from "./client/ThingTypeManager";
+import { g_feature } from "./client/globals";
 
 dotenv.config();
 
 const CLIENT_VERSION = Number(process.env.CLIENT_VERSION) || 1097;
-const featureManager = new GameFeatureManager();
-featureManager.setupFeaturesBasedOnClientVersion(CLIENT_VERSION);
+g_feature.setupFeaturesBasedOnClientVersion(CLIENT_VERSION);
 
-const thingTypeManager = new ThingTypeManager(featureManager, CLIENT_VERSION);
+const thingTypeManager = new ThingTypeManager(CLIENT_VERSION);
 
 function loadDat() {
-  const loadedDatSuccessfully = thingTypeManager.loadDat(
-    `./data/${CLIENT_VERSION}/Tibia.dat`
-  );
+  const loadedDatSuccessfully = thingTypeManager.loadDat(`./data/${CLIENT_VERSION}/Tibia.dat`);
 
   return loadedDatSuccessfully;
 }
@@ -31,7 +28,6 @@ function login() {
   });
 
   const protocol = new ProtocolLogin({
-    featureManager,
     rsa,
     onCharacterList: (character, account) => {
       console.log({ character, account });

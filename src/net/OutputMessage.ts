@@ -117,10 +117,7 @@ export default class OutputMessage {
       throw new Error("OutputMessage Insufficient message size to encrypt");
     }
 
-    const partToEncrypt = this._buffer.subarray(
-      this._writePos - rsaSize,
-      this._writePos
-    );
+    const partToEncrypt = this._buffer.subarray(this._writePos - rsaSize, this._writePos);
 
     const encrypted = this._rsa.encrypt(partToEncrypt);
 
@@ -128,10 +125,7 @@ export default class OutputMessage {
   }
 
   writeChecksum() {
-    const checksumAbleBuffer = this._buffer.subarray(
-      this._headerPos,
-      this._messageSize
-    );
+    const checksumAbleBuffer = this._buffer.subarray(this._headerPos, this._messageSize);
 
     const checksum = adler32(checksumAbleBuffer);
 

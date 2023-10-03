@@ -136,14 +136,7 @@ export default class Position {
   }
 
   isMapPosition() {
-    return (
-      this.x >= 0 &&
-      this.y >= 0 &&
-      this.z >= 0 &&
-      this.x < 65535 &&
-      this.y < 65535 &&
-      this.z <= MAX_Z
-    );
+    return this.x >= 0 && this.y >= 0 && this.z >= 0 && this.x < 65535 && this.y < 65535 && this.z <= MAX_Z;
   }
 
   isValid() {
@@ -198,20 +191,10 @@ export default class Position {
   }
 
   isInRange(pos: Position, rangeX: number, rangeY: number) {
-    return (
-      Math.abs(this.x - pos.x) <= rangeX &&
-      Math.abs(this.y - pos.y) <= rangeY &&
-      this.z === pos.z
-    );
+    return Math.abs(this.x - pos.x) <= rangeX && Math.abs(this.y - pos.y) <= rangeY && this.z === pos.z;
   }
 
-  isBetweenRange(
-    pos: Position,
-    minRangeX: number,
-    minRangeY: number,
-    maxRangeX: number,
-    maxRangeY: number
-  ) {
+  isBetweenRange(pos: Position, minRangeX: number, minRangeY: number, maxRangeX: number, maxRangeY: number) {
     return (
       Math.abs(this.x - pos.x) >= minRangeX &&
       Math.abs(this.y - pos.y) >= minRangeY &&
@@ -247,14 +230,7 @@ export default class Position {
     const nx = this.x + n;
     const ny = this.y + n;
     const nz = this.z - n;
-    if (
-      nx >= 0 &&
-      nx <= 65535 &&
-      ny >= 0 &&
-      ny <= 65535 &&
-      nz >= 0 &&
-      nz <= MAX_Z
-    ) {
+    if (nx >= 0 && nx <= 65535 && ny >= 0 && ny <= 65535 && nz >= 0 && nz <= MAX_Z) {
       this.x = nx;
       this.y = ny;
       this.z = nz;
@@ -267,14 +243,7 @@ export default class Position {
     const nx = this.x - n;
     const ny = this.y - n;
     const nz = this.z + n;
-    if (
-      nx >= 0 &&
-      nx <= 65535 &&
-      ny >= 0 &&
-      ny <= 65535 &&
-      nz >= 0 &&
-      nz <= MAX_Z
-    ) {
+    if (nx >= 0 && nx <= 65535 && ny >= 0 && ny <= 65535 && nz >= 0 && nz <= MAX_Z) {
       this.x = nx;
       this.y = ny;
       this.z = nz;

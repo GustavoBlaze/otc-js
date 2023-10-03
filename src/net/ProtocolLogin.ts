@@ -1,9 +1,9 @@
 import assert from "node:assert";
-import { ClientOPCode, ClientVersion, GameFeature } from "~/constants";
-import GameFeatureManager from "~/client/GameFeatureManager";
+import { ClientOPCode, GameFeature } from "~/constants";
 import { RSA } from "~/utils/crypt";
 import createLogger from "~/utils/logger";
 import ipToString from "~/utils/ip-to-string";
+import { g_feature } from "~/client/globals";
 import Protocol from "./Protocol";
 import OutputMessage from "./OutputMessage";
 import InputMessage from "./InputMessage";
@@ -58,7 +58,6 @@ enum SubscriptionStatus {
 }
 
 interface ConstructorProps {
-  featureManager: GameFeatureManager;
   rsa: RSA;
   onLoginError?: (error: string) => void;
   onCharacterList?: (characters: Character[], account: Account) => void;
@@ -90,8 +89,6 @@ export default class ProtocolLogin extends Protocol {
 
   private _stayLogged?: boolean;
 
-  private _featureManager: GameFeatureManager;
-
   private _rsa: RSA;
 
   private _contentRevision: number;
@@ -100,10 +97,7 @@ export default class ProtocolLogin extends Protocol {
 
   private _onLoginError?: (error: string) => void;
 
-  private _onCharacterList?: (
-    characters: Character[],
-    account: Account
-  ) => void;
+  private _onCharacterList?: (characters: Character[], account: Account) => void;
 
   private _onMotd?: (motd: string) => void;
 
@@ -114,7 +108,6 @@ export default class ProtocolLogin extends Protocol {
   private _clientVersion: number;
 
   constructor({
-    featureManager,
     rsa,
     onLoginError,
     onCharacterList,
@@ -127,7 +120,6 @@ export default class ProtocolLogin extends Protocol {
   }: ConstructorProps) {
     super();
 
-    this._featureManager = featureManager;
     this._rsa = rsa;
     this._onLoginError = onLoginError;
     this._onCharacterList = onCharacterList;
@@ -160,16 +152,16 @@ export default class ProtocolLogin extends Protocol {
 
   private sendLoginPacket() {
     const msg = new OutputMessage(this._rsa);
-    msg.addU8(ClientOPCode.ClientEnterAccount);
+    msg.addU8(ClientOPCode.EnterAccount);
     msg.addU16(11); // Linux
 
     msg.addU16(this._clientVersion); // protocol version but usually it is the same as client version
 
-    if (this._featureManager.getFeature(GameFeature.GameClientVersion)) {
+    if (g_feature.getFeature(GameFeature.GameClientVersion)) {
       msg.addU32(this._clientVersion);
     }
 
-    if (this._featureManager.getFeature(GameFeature.GameContentRevision)) {
+    if (g_feature.getFeature(GameFeature.GameContentRevision)) {
       msg.addU16(this._contentRevision ?? 0);
       msg.addU16(0);
     } else {
@@ -179,15 +171,13 @@ export default class ProtocolLogin extends Protocol {
     msg.addU32(1508150786); // todo: g_sprites.getSprSignature()
     msg.addU32(PIC_SIGNATURE);
 
-    if (this._featureManager.getFeature(GameFeature.GamePreviewState)) {
+    if (g_feature.getFeature(GameFeature.GamePreviewState)) {
       msg.addU8(0);
     }
 
     let offset = msg.getMessageSize();
 
-    if (
-      this._featureManager.getFeature(GameFeature.GameLoginPacketEncryption)
-    ) {
+    if (g_feature.getFeature(GameFeature.GameLoginPacketEncryption)) {
       msg.addU8(0);
 
       this.generateXTEAKey();
@@ -199,7 +189,7 @@ export default class ProtocolLogin extends Protocol {
       msg.addU32(key[3]);
     }
 
-    if (this._featureManager.getFeature(GameFeature.GameAccountNames)) {
+    if (g_feature.getFeature(GameFeature.GameAccountNames)) {
       msg.addString(this._accountName);
     } else {
       msg.addU32(Number(this._accountName));
@@ -219,13 +209,11 @@ export default class ProtocolLogin extends Protocol {
       msg.addU8(0);
     }
 
-    if (
-      this._featureManager.getFeature(GameFeature.GameLoginPacketEncryption)
-    ) {
+    if (g_feature.getFeature(GameFeature.GameLoginPacketEncryption)) {
       msg.encryptRSA();
     }
 
-    if (this._featureManager.getFeature(GameFeature.GameOGLInformation)) {
+    if (g_feature.getFeature(GameFeature.GameOGLInformation)) {
       msg.addU8(1); // unknown
       msg.addU8(1); // unknown
 
@@ -238,13 +226,13 @@ export default class ProtocolLogin extends Protocol {
       msg.addString("version"); // todo: g_graphics.getVersion()
     }
 
-    if (this._featureManager.getFeature(GameFeature.GameAuthenticator)) {
+    if (g_feature.getFeature(GameFeature.GameAuthenticator)) {
       offset = msg.getMessageSize();
 
       msg.addU8(0);
       msg.addString(this._authenticatorToken || "");
 
-      if (this._featureManager.getFeature(GameFeature.GameSessionKey)) {
+      if (g_feature.getFeature(GameFeature.GameSessionKey)) {
         msg.addU8(Number(this._stayLogged));
       }
 
@@ -258,15 +246,13 @@ export default class ProtocolLogin extends Protocol {
       msg.encryptRSA();
     }
 
-    if (this._featureManager.getFeature(GameFeature.GameProtocolChecksum)) {
+    if (g_feature.getFeature(GameFeature.GameProtocolChecksum)) {
       this.enableChecksum();
     }
 
     this.send(msg);
 
-    if (
-      this._featureManager.getFeature(GameFeature.GameLoginPacketEncryption)
-    ) {
+    if (g_feature.getFeature(GameFeature.GameLoginPacketEncryption)) {
       this.enableXTEAEncryption();
     }
   }
@@ -368,11 +354,7 @@ export default class ProtocolLogin extends Protocol {
           worldName: message.getString(),
           worldIp: ipToString(message.getU32()),
           worldPort: message.getU16(),
-          previewState: this._featureManager.getFeature(
-            GameFeature.GamePreviewState
-          )
-            ? message.getU8()
-            : undefined,
+          previewState: g_feature.getFeature(GameFeature.GamePreviewState) ? message.getU8() : undefined,
         });
       }
     }
@@ -390,10 +372,7 @@ export default class ProtocolLogin extends Protocol {
     } else {
       account.status = AccountStatus.Ok;
       account.premiumDays = message.getU16();
-      account.status =
-        account.premiumDays > 0
-          ? SubscriptionStatus.Premium
-          : SubscriptionStatus.Free;
+      account.status = account.premiumDays > 0 ? SubscriptionStatus.Premium : SubscriptionStatus.Free;
     }
 
     this._onCharacterList?.(characters, account);

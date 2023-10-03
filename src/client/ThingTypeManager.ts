@@ -2,7 +2,6 @@ import { FileStream } from "~/core";
 import { ThingAttr, ThingCategory } from "~/constants";
 import createLogger from "~/utils/logger";
 import ThingType from "./ThingType";
-import GameFeatureManager from "./GameFeatureManager";
 
 const logger = createLogger("ThingTypeManager");
 export default class ThingTypeManager {
@@ -14,22 +13,16 @@ export default class ThingTypeManager {
 
   private _contentRevision = 0;
 
-  private _featureManager: GameFeatureManager;
-
   private _clientVersion: number;
 
   static _nullThingType = new ThingType();
 
-  constructor(featureManager: GameFeatureManager, clientVersion: number) {
-    this._featureManager = featureManager;
+  constructor(clientVersion: number) {
     this._clientVersion = clientVersion;
   }
 
   getThingType(id: number, category: ThingCategory) {
-    if (
-      category >= ThingCategory.ThingLastCategory ||
-      id >= this._thingTypes[category]?.length
-    ) {
+    if (category >= ThingCategory.ThingLastCategory || id >= this._thingTypes[category]?.length) {
       console.error(
         `[ThingTypeManager]: getThingType: invalid id or category. Id:${id} Category:${category}`
       );
@@ -85,11 +78,7 @@ export default class ThingTypeManager {
         this._thingTypes[i] = new Array<ThingType>(count);
       }
 
-      for (
-        let category = 0;
-        category < ThingCategory.ThingLastCategory;
-        category++
-      ) {
+      for (let category = 0; category < ThingCategory.ThingLastCategory; category++) {
         let firstId = 1;
 
         if (category === ThingCategory.ThingCategoryItem) {
@@ -99,13 +88,7 @@ export default class ThingTypeManager {
         for (let id = firstId; id < this._thingTypes[category].length; id++) {
           const type = new ThingType();
 
-          type.unserialize(
-            id,
-            category as ThingCategory,
-            fileStream,
-            this._featureManager,
-            this._clientVersion
-          );
+          type.unserialize(id, category as ThingCategory, fileStream, this._clientVersion);
           this._thingTypes[category][id] = type;
         }
       }

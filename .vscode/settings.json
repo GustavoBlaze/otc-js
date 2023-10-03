@@ -2,6 +2,9 @@
   // "editor.formatOnSave": true,
   "cSpell.words": [
     "Automap",
+    "camelcase",
+    "Cooldown",
+    "Gamemaster",
     "jsbn",
     "KJUR",
     "tlen",
@@ -20,5 +23,6 @@
     "editor.codeActionsOnSave": {
       "source.fixAll.eslint": true
     }
-  }
+  },
+  "editor.rulers": [110, 150],
 }

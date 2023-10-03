@@ -24,10 +24,7 @@ export default class RSA {
     });
 
     const secondSequence = new KJUR.asn1.DERSequence({
-      array: [
-        new KJUR.asn1.DERInteger({ bigint: this.n }),
-        new KJUR.asn1.DERInteger({ int: this.e }),
-      ],
+      array: [new KJUR.asn1.DERInteger({ bigint: this.n }), new KJUR.asn1.DERInteger({ int: this.e })],
     });
 
     const bitString = new KJUR.asn1.DERBitString({
